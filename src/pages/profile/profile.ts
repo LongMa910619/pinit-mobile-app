@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { MenuController, SegmentButton, App, NavParams, LoadingController } from 'ionic-angular';
-import { FollowersPage } from '../followers/followers';
 import { SettingsPage } from '../settings/settings';
 import { ProfileModel } from './profile.model';
 import { ProfileService } from './profile.service';
@@ -39,22 +38,6 @@ export class ProfilePage {
         this.profile.posts = data.posts;
         this.loading.dismiss();
       });
-  }
-
-  goToFollowersList() {
-    // close the menu when clicking a link from the menu
-    this.menu.close();
-    this.app.getRootNav().push(FollowersPage, {
-      list: this.profile.followers
-    });
-  }
-
-  goToFollowingList() {
-    // close the menu when clicking a link from the menu
-    this.menu.close();
-    this.app.getRootNav().push(FollowersPage, {
-      list: this.profile.following
-    });
   }
 
   goToSettings() {

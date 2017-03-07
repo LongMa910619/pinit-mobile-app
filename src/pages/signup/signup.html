@@ -8,6 +8,15 @@
   <h2 class="auth-title">Create an account</h2>
   <form class="signup-form auth-form" [formGroup]="signup" (ngSubmit)="doSignup()">
     <ion-item>
+      <ion-input type="text" placeholder="Family Name (account name)" formControlName="account_name"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-input type="text" placeholder="Postcode" formControlName="postcode"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-input type="text" placeholder="Your name" formControlName="name"></ion-input>
+    </ion-item>
+    <ion-item>
       <ion-input type="email" placeholder="Email" formControlName="email"></ion-input>
     </ion-item>
     <show-hide-container>
@@ -22,11 +31,6 @@
     </show-hide-container>
     <button ion-button block class="auth-action-button signup-button" type="submit" [disabled]="!signup.valid">Sign up</button>
   </form>
-  <p class="auth-divider">
-    Or
-  </p>
-  <button ion-button block class="facebook-auth-button" (click)="doFacebookSignup()">Sign up with Facebook</button>
-  <button ion-button block class="google-auth-button" (click)="doGoogleSignup()">Sign up with Google</button>
   <p class="legal-stuff">
     By creating an account you agree to our <a class="legal-action" (click)="showPrivacyModal()">Privacy policy</a> and <a class="legal-action" (click)="showTermsModal()">Terms of use</a>
   </p>

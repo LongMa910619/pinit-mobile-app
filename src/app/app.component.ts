@@ -37,6 +37,7 @@ export class MyApp {
 
     this.pages = [
       { title: 'Home', icon: 'home', component: TabsNavigationPage }
+    ];
 
     this.pushPages = [
       { title: 'Settings', icon: 'settings', component: SettingsPage }
