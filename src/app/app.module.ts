@@ -1,7 +1,11 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { IonicApp, IonicModule } from 'ionic-angular';
-import { MyApp } from './app.component';
+import { IonicApp, IonicModule, Platform } from 'ionic-angular';
 
+import { AuthHttp, AuthConfig } from 'angular2-jwt';
+import { Http } from '@angular/http';
+import { Storage } from '@ionic/storage';
+
+import { MyApp } from './app.component';
 
 import { LoginPage } from '../pages/login/login';
 import { ProfilePage } from '../pages/profile/profile';
@@ -26,7 +30,6 @@ import { ProfileService } from '../pages/profile/profile.service';
     ForgotPasswordPage,
     TermsOfServicePage,
     PrivacyPolicyPage
-
   ],
   imports: [
     IonicModule.forRoot(MyApp)
@@ -42,10 +45,11 @@ import { ProfileService } from '../pages/profile/profile.service';
     ForgotPasswordPage,
     SignupPage,
     TermsOfServicePage,
-    PrivacyPolicyPage,
+    PrivacyPolicyPage
   ],
   providers: [
-    ProfileService
+    ProfileService,
+    Storage
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })

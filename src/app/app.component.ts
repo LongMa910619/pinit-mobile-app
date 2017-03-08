@@ -6,6 +6,8 @@ import { TabsNavigationPage } from '../pages/tabs-navigation/tabs-navigation';
 import { WalkthroughPage } from '../pages/walkthrough/walkthrough';
 import { SettingsPage } from '../pages/settings/settings';
 
+import { AuthHttp, AuthConfig } from 'angular2-jwt';
+import { Http } from '@angular/http';
 
 @Component({
   selector: 'app-root',
