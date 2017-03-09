@@ -6,9 +6,6 @@ import { TabsNavigationPage } from '../pages/tabs-navigation/tabs-navigation';
 import { WalkthroughPage } from '../pages/walkthrough/walkthrough';
 import { SettingsPage } from '../pages/settings/settings';
 
-import { AuthHttp, AuthConfig } from 'angular2-jwt';
-import { Http } from '@angular/http';
-
 @Component({
   selector: 'app-root',
   templateUrl: 'app.html'
@@ -20,7 +17,6 @@ export class MyApp {
   // make WalkthroughPage the root (or first) page
   rootPage: any = WalkthroughPage;
   // rootPage: any = TabsNavigationPage;
-
 
   pages: Array<{title: string, icon: string, component: any}>;
   pushPages: Array<{title: string, icon: string, component: any}>;

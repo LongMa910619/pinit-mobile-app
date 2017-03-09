@@ -1,8 +1,6 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { IonicApp, IonicModule, Platform } from 'ionic-angular';
 
-import { AuthHttp, AuthConfig } from 'angular2-jwt';
-import { Http } from '@angular/http';
 import { Storage } from '@ionic/storage';
 
 import { MyApp } from './app.component';
@@ -18,6 +16,8 @@ import { TermsOfServicePage } from '../pages/terms-of-service/terms-of-service';
 import { PrivacyPolicyPage } from '../pages/privacy-policy/privacy-policy';
 import { ProfileService } from '../pages/profile/profile.service';
 
+import { PreloadImage } from '../components/preload-image/preload-image';
+
 @NgModule({
   declarations: [
     MyApp,
@@ -29,7 +29,9 @@ import { ProfileService } from '../pages/profile/profile.service';
     SignupPage,
     ForgotPasswordPage,
     TermsOfServicePage,
-    PrivacyPolicyPage
+    PrivacyPolicyPage,
+
+    PreloadImage
   ],
   imports: [
     IonicModule.forRoot(MyApp)

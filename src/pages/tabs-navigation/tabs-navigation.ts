@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 
-import { ProfilePage } from '../profile/profile';
+import { SettingsPage } from '../settings/settings';
+
 
 @Component({
   selector: 'tabs-navigation',
@@ -12,6 +13,6 @@ export class TabsNavigationPage {
   tab3Root: any;
 
   constructor() {
-    this.tab2Root = ProfilePage;
+    this.tab1Root = SettingsPage;
   }
 }

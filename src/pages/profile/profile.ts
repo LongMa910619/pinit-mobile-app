@@ -33,9 +33,9 @@ export class ProfilePage {
       .getData()
       .then(data => {
         this.profile.user = data.user;
-        this.profile.following = data.following;
-        this.profile.followers = data.followers;
-        this.profile.posts = data.posts;
+        // this.profile.following = data.following;
+        // this.profile.followers = data.followers;
+        // this.profile.posts = data.posts;
         this.loading.dismiss();
       });
   }
