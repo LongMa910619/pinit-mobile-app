@@ -56,7 +56,6 @@ export class SettingsPage {
       this.profile = value.user;
     });
 
-
     this.storage.get('authorize_identity').then((data) => {
       this.contentHeader.append('access-token', data['access-token']);
       this.contentHeader.append('client', data['client']);
@@ -64,6 +63,21 @@ export class SettingsPage {
     });
   }
 
+  // ionViewCanEnter() : boolean{
+  //   return false
+  // }
+
+  // loggedIn() {
+  //   this.storage.get('user').then((value) => {
+  //     if(value){
+  //       var loggedin = true;
+  //     }else{
+  //       var loggedin = false;
+  //     }
+  //   });
+  // }
+
+  // Functionality
   logout() {
     // navigate to the new page if it is not the current page
     this.nav.setRoot(this.rootPage);
@@ -141,6 +155,8 @@ export class SettingsPage {
     );
   }
 
+
+  // Modal Display
   showTermsModal() {
     let modal = this.modal.create(TermsOfServicePage);
     modal.present();

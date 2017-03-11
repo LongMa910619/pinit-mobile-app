@@ -58,19 +58,11 @@ export class LoginPage {
           var authorize_identity = {
             "access-token": headers.get('access-token'),
             "uid": headers.get('uid'),
-            "client": headers.get('client')
+            "client": headers.get('client'),
+            "expiry": headers.get('expiry')
           }
           this.storage.set('authorize_identity', authorize_identity);
-
           this.storage.set('user', data);
-          this.storage.get("user").then((value) => {
-            console.log(value);
-            console.log("this is login");
-          });
-
-          this.storage.get("authorize_identity").then((value) => {
-            console.log(value);
-          });
 
           this.nav.setRoot(this.main_page.component);
           this.loading.dismiss();
