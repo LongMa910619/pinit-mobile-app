@@ -23,6 +23,7 @@ export class LoginPage {
   loading: any;
 
   LOGIN_URL: string = "http://localhost:3000/api/v1/auth/sign_in";
+  // LOGIN_URL: string = "https://pinit-webapp.herokuapp.com/api/v1/auth/sign_in";
 
   // We need to set the content type for the server
   contentHeader: Headers = new Headers({"Content-Type": "application/json"});
@@ -51,6 +52,7 @@ export class LoginPage {
       .subscribe(
         res => {
           var data = res.json();
+          console.log(data);
           var headers = res.headers;
 
           var authorize_identity = {
@@ -58,12 +60,12 @@ export class LoginPage {
             "uid": headers.get('uid'),
             "client": headers.get('client')
           }
-          this.storage.set('authorize_identity', null);
           this.storage.set('authorize_identity', authorize_identity);
 
           this.storage.set('user', data);
           this.storage.get("user").then((value) => {
             console.log(value);
+            console.log("this is login");
           });
 
           this.storage.get("authorize_identity").then((value) => {

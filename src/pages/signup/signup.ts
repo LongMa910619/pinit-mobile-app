@@ -21,6 +21,8 @@ export class SignupPage {
   loading: any;
 
   SIGNUP_URL: string = "http://localhost:3000/api/v1/auth";
+  // SIGNUP_URL: string = "https://pinit-webapp.herokuapp.com/api/v1/auth";
+
   contentHeader: Headers = new Headers({"Content-Type": "application/json"});
 
   constructor(
@@ -67,8 +69,6 @@ export class SignupPage {
           }
         }
       );
-
-    // this.nav.setRoot(this.main_page.component);
   }
 
   showTermsModal() {

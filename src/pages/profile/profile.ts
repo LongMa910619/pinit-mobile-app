@@ -29,15 +29,15 @@ export class ProfilePage {
 
   ionViewDidLoad() {
     this.loading.present();
-    this.profileService
-      .getData()
-      .then(data => {
-        this.profile.user = data.user;
-        // this.profile.following = data.following;
-        // this.profile.followers = data.followers;
-        // this.profile.posts = data.posts;
-        this.loading.dismiss();
-      });
+    // this.profileService
+    //   .getData()
+    //   .then(data => {
+    //     this.profile = data;
+    //     // this.profile.following = data.following;
+    //     // this.profile.followers = data.followers;
+    //     // this.profile.posts = data.posts;
+    //     this.loading.dismiss();
+    //   });
   }
 
   goToSettings() {

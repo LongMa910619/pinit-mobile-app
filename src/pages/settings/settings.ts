@@ -6,7 +6,6 @@ import { TermsOfServicePage } from '../terms-of-service/terms-of-service';
 import { PrivacyPolicyPage } from '../privacy-policy/privacy-policy';
 import { LoginPage } from '../login/login';
 
-
 import 'rxjs/Rx';
 import { ProfileModel } from '../profile/profile.model';
 import { ProfileService } from '../profile/profile.service';
@@ -31,6 +30,8 @@ export class SettingsPage {
   profile: ProfileModel = new ProfileModel();
 
   SAVE_PROFILE_URL: string = "http://localhost:3000/api/v1/profile/update";
+  // SAVE_PROFILE_URL: string = "https://pinit-webapp.herokuapp.com/api/v1/profile/update";
+
   contentHeader: Headers = new Headers({"Content-Type": "application/json"});
 
   constructor(
@@ -52,15 +53,11 @@ export class SettingsPage {
 
   ionViewDidLoad() {
     this.storage.get('user').then((value) => {
-      console.log(value);
-      this.profile.user = value.data;
+      this.profile = value.user;
     });
 
-    this.storage.get('authorize_identity').then((data) => {
-      console.log(data['access-token']);
-      console.log(data['uid']);
-      console.log(data['client']);
 
+    this.storage.get('authorize_identity').then((data) => {
       this.contentHeader.append('access-token', data['access-token']);
       this.contentHeader.append('client', data['client']);
       this.contentHeader.append('uid', data['uid']);
@@ -78,7 +75,9 @@ export class SettingsPage {
 
     console.log(this.contentHeader);
 
-    this.http.put(this.SAVE_PROFILE_URL, JSON.stringify(this.settingsForm.getRawValue()), { headers: this.contentHeader })
+    console.log(this.settingsForm);
+    this.settingsForm.getRawValue();
+    this.http.put(this.SAVE_PROFILE_URL, JSON.stringify(this.profile), { headers: this.contentHeader })
       .map(
         res => res.json()
       )

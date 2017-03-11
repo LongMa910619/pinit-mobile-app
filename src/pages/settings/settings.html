@@ -13,7 +13,7 @@
   <div class="user-image-content">
     <ion-row no-padding class="user-image-row">
       <ion-col no-padding width-40>
-        <preload-image class="user-image" [ratio]="{w:1, h:1}" [src]="profile.user.avatar" alt="aca va la img" title="IMAGE!"></preload-image>
+        <preload-image class="user-image" [ratio]="{w:1, h:1}" [src]="profile.avatar" alt="aca va la img" title="IMAGE!"></preload-image>
       </ion-col>
     </ion-row>
     <h3 class="image-action" (click)="takePhoto()">Change profile picture</h3>
@@ -22,13 +22,16 @@
   <form [formGroup]="settingsForm" class="settings-form">
     <ion-list class="user-data-content">
       <ion-item>
-        <ion-input type="text" placeholder="Your name" formControlName="name" [value]="profile.user.name"></ion-input>
+        <ion-input type="text" placeholder="Your name" formControlName="name" [value]="profile.name"></ion-input>
+        {{profile}}
       </ion-item>
+
       <ion-item>
-        <ion-input type="text" placeholder="Family Name (account name)" formControlName="account_name"></ion-input>
+        <ion-input type="text" placeholder="Family Name (account name)" formControlName="account_name" [value]="profile.account.name"></ion-input>
       </ion-item>
+
       <ion-item>
-        <ion-input type="text" placeholder="Postcode" formControlName="postcode"></ion-input>
+        <ion-input type="text" placeholder="Postcode" formControlName="postcode" [value]="profile.account.postcode"></ion-input>
       </ion-item>
     </ion-list>
   </form>
