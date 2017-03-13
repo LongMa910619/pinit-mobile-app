@@ -63,19 +63,16 @@ export class SettingsPage {
     });
   }
 
-  // ionViewCanEnter() : boolean{
-  //   return false
-  // }
-
-  // loggedIn() {
-  //   this.storage.get('user').then((value) => {
-  //     if(value){
-  //       var loggedin = true;
-  //     }else{
-  //       var loggedin = false;
-  //     }
-  //   });
-  // }
+  ionViewWillEnter(){
+    this.storage.get('user').then((value) => {
+      if(value){
+        // do nothing is authorized
+      }else{
+        this.nav.setRoot(this.rootPage);
+        // unauthorized
+      }
+    });
+  }
 
   // Functionality
   logout() {
