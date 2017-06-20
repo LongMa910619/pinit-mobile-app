@@ -20,8 +20,8 @@ export class SignupPage {
   main_page: { component: any };
   loading: any;
 
-  SIGNUP_URL: string = "http://localhost:3000/api/v1/auth";
-  // SIGNUP_URL: string = "https://pinit-webapp.herokuapp.com/api/v1/auth";
+  // SIGNUP_URL: string = "http://localhost:3000/api/v1/auth";
+  SIGNUP_URL: string = "https://pinit-staging-eu.herokuapp.com/api/v1/auth";
 
   contentHeader: Headers = new Headers({"Content-Type": "application/json"});
 

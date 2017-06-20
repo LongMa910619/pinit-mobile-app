@@ -12,6 +12,7 @@ import { ProfileService } from '../profile/profile.service';
 
 import { Http, Headers } from '@angular/http';
 import { Storage } from '@ionic/storage';
+import { NativeStorage } from '@ionic-native/native-storage';
 import { Camera, File } from 'ionic-native'
 
 declare var cordova;
@@ -29,8 +30,8 @@ export class SettingsPage {
 
   profile: ProfileModel = new ProfileModel();
 
-  SAVE_PROFILE_URL: string = "http://localhost:3000/api/v1/profile/update";
-  // SAVE_PROFILE_URL: string = "https://pinit-webapp.herokuapp.com/api/v1/profile/update";
+  // SAVE_PROFILE_URL: string = "http://localhost:3000/api/v1/profile/update";
+  SAVE_PROFILE_URL: string = "https://pinit-staging-eu.herokuapp.com/api/v1/profile/update";
 
   contentHeader: Headers = new Headers({"Content-Type": "application/json"});
 
@@ -40,6 +41,7 @@ export class SettingsPage {
     public loadingCtrl: LoadingController,
     public profileService: ProfileService,
     public storage: Storage,
+    private nativeStorage: NativeStorage,
     private platform: Platform,
     private http: Http,
     public  toastCtrl: ToastController
@@ -52,26 +54,61 @@ export class SettingsPage {
   }
 
   ionViewDidLoad() {
-    this.storage.get('user').then((value) => {
-      this.profile = value.user;
-    });
 
-    this.storage.get('authorize_identity').then((data) => {
-      this.contentHeader.append('access-token', data['access-token']);
-      this.contentHeader.append('client', data['client']);
-      this.contentHeader.append('uid', data['uid']);
-    });
+    if(this.platform.is('cordova')){
+
+      this.nativeStorage.getItem('user').then(
+        data => {
+          this.profile = data.user;
+        },
+        error => console.error(error)
+      );
+
+      this.nativeStorage.getItem('authorize_identity').then(
+        data => {
+          this.contentHeader.append('access-token', data['access-token']);
+          this.contentHeader.append('client', data['client']);
+          this.contentHeader.append('uid', data['uid']);
+        },
+        error => console.error(error)
+      );
+     }else{
+      this.storage.get('user').then((value) => {
+        this.profile = value.user;
+      });
+
+      this.storage.get('authorize_identity').then((data) => {
+        this.contentHeader.append('access-token', data['access-token']);
+        this.contentHeader.append('client', data['client']);
+        this.contentHeader.append('uid', data['uid']);
+      });
+     }
+
   }
 
   ionViewWillEnter(){
-    this.storage.get('user').then((value) => {
-      if(value){
-        // do nothing is authorized
-      }else{
-        this.nav.setRoot(this.rootPage);
-        // unauthorized
-      }
-    });
+    if(this.platform.is('cordova')){
+      this.nativeStorage.getItem('user').then(
+        value => {
+          if(value){
+            // do nothing is authorized
+          }else{
+            this.nav.setRoot(this.rootPage);
+            // unauthorized
+          }
+        },
+        error => console.error(error)
+      );
+    }else{
+      this.storage.get('user').then((value) => {
+        if(value){
+          // do nothing is authorized
+        }else{
+          this.nav.setRoot(this.rootPage);
+          // unauthorized
+        }
+      });
+    }
   }
 
   // Functionality
@@ -94,7 +131,11 @@ export class SettingsPage {
       )
       .subscribe(
         data => {
-          this.storage.set('user', data);
+          if(this.platform.is('cordova')){
+            this.nativeStorage.setItem('user', data);
+           }else{
+            this.storage.set('user', data);
+           }
           this.loading.dismiss();
         },
         err => {

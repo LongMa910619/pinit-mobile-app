@@ -1,11 +1,11 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { IonicApp, IonicModule, Platform } from 'ionic-angular';
 
-import { Storage } from '@ionic/storage';
-
 import { MyApp } from './app.component';
+import { IonicStorageModule } from '@ionic/storage';
 
 import { LoginPage } from '../pages/login/login';
+import { MapPage } from '../pages/map/map';
 import { ProfilePage } from '../pages/profile/profile';
 import { TabsNavigationPage } from '../pages/tabs-navigation/tabs-navigation';
 import { WalkthroughPage } from '../pages/walkthrough/walkthrough';
@@ -16,11 +16,19 @@ import { TermsOfServicePage } from '../pages/terms-of-service/terms-of-service';
 import { PrivacyPolicyPage } from '../pages/privacy-policy/privacy-policy';
 import { ProfileService } from '../pages/profile/profile.service';
 
+import { NativeStorage } from '@ionic-native/native-storage';
+import { OneSignal } from '@ionic-native/onesignal';
+
+import { BrowserModule } from '@angular/platform-browser';
+import { HttpModule } from '@angular/http';
+import { SplashScreen } from '@ionic-native/splash-screen';
+import { StatusBar } from '@ionic-native/status-bar';
 import { PreloadImage } from '../components/preload-image/preload-image';
 
 @NgModule({
   declarations: [
     MyApp,
+    MapPage,
     LoginPage,
     ProfilePage,
     TabsNavigationPage,
@@ -34,11 +42,15 @@ import { PreloadImage } from '../components/preload-image/preload-image';
     PreloadImage
   ],
   imports: [
-    IonicModule.forRoot(MyApp)
+    BrowserModule,
+    HttpModule,
+    IonicModule.forRoot(MyApp),
+    IonicStorageModule.forRoot()
   ],
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
+    MapPage,
     LoginPage,
     ProfilePage,
     TabsNavigationPage,
@@ -50,8 +62,11 @@ import { PreloadImage } from '../components/preload-image/preload-image';
     PrivacyPolicyPage
   ],
   providers: [
-    ProfileService,
-    Storage
+    SplashScreen,
+    StatusBar,
+    OneSignal,
+    NativeStorage,
+    ProfileService
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })

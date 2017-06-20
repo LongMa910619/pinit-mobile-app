@@ -1,19 +1,32 @@
 <!--
   Generated template for the MapPage page.
 
-  See http://ionicframework.com/docs/v2/components/#navigation for more info on
+  See http://ionicframework.com/docs/components/#navigation for more info on
   Ionic pages and navigation.
 -->
-
 <ion-header>
-  <ion-navbar>
+
+  <ion-navbar  #content>
     <button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>Devices</ion-title>
+    <ion-title>PinIT GPS</ion-title>
   </ion-navbar>
+
 </ion-header>
 
-<ion-content padding>
+<ion-menu [content]="content" [swipeEnabled]="false">
+  <ion-content class="menu-content">
+    <ion-list class="menu-list">
+      <button ion-item detail-none *ngFor="let page of pages" (click)="openPage(page)">
+        <ion-icon *ngIf="page.icon" name="{{page.icon}}" item-left></ion-icon>
+        {{page.title}}
+      </button>
+    </ion-list>
+  </ion-content>
+</ion-menu>
 
+<ion-content padding>
+  <div #map id="map"></div>
 </ion-content>
+
