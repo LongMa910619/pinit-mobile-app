@@ -10,21 +10,17 @@
     <button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>PinIT GPS</ion-title>
+    <ion-title style="float:left;height:45px">
+      <img src="./assets/images/logo.png" />
+    </ion-title>
+    <!--ion-select #selectdevice style="float:left" [(ngModel)]="device" (ionChange)="onDeviceChange($event)">
+      <ion-option value="" selected>Select Watch</ion-option>
+      <ion-option *ngFor="let device of devices" value="{{device.id}}">{{ device.friendly_name }}</ion-option>
+    </ion-select>
+    <button ion-button (click)="gotoAddWatch()">+ Add Watch</button-->
   </ion-navbar>
 
 </ion-header>
-
-<ion-menu [content]="content" [swipeEnabled]="false">
-  <ion-content class="menu-content">
-    <ion-list class="menu-list">
-      <button ion-item detail-none *ngFor="let page of pages" (click)="openPage(page)">
-        <ion-icon *ngIf="page.icon" name="{{page.icon}}" item-left></ion-icon>
-        {{page.title}}
-      </button>
-    </ion-list>
-  </ion-content>
-</ion-menu>
 
 <ion-content padding>
   <div #map id="map"></div>

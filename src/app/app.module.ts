@@ -10,6 +10,8 @@ import { ProfilePage } from '../pages/profile/profile';
 import { TabsNavigationPage } from '../pages/tabs-navigation/tabs-navigation';
 import { WalkthroughPage } from '../pages/walkthrough/walkthrough';
 import { SettingsPage } from '../pages/settings/settings';
+import { AddWatchPage } from '../pages/add-watch/add-watch';
+import { SubMenuPage } from '../pages/sub-menu/sub-menu';
 import { SignupPage } from '../pages/signup/signup';
 import { ForgotPasswordPage } from '../pages/forgot-password/forgot-password';
 import { TermsOfServicePage } from '../pages/terms-of-service/terms-of-service';
@@ -34,6 +36,8 @@ import { PreloadImage } from '../components/preload-image/preload-image';
     TabsNavigationPage,
     WalkthroughPage,
     SettingsPage,
+    AddWatchPage,
+    SubMenuPage,
     SignupPage,
     ForgotPasswordPage,
     TermsOfServicePage,
@@ -56,6 +60,8 @@ import { PreloadImage } from '../components/preload-image/preload-image';
     TabsNavigationPage,
     WalkthroughPage,
     SettingsPage,
+    AddWatchPage,
+    SubMenuPage,
     ForgotPasswordPage,
     SignupPage,
     TermsOfServicePage,

@@ -1,0 +1,17 @@
+<ion-header class="sub-menu-header auth-header">
+  <ion-navbar>
+    <ion-title>AAA</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="sub-menu-content auth-content">
+  <button #draw *ngIf="showDrawBtn" ion-button block class="auth-action-button sub-menu-button" (click)="drawCircle()"><ion-icon name="notifications"></ion-icon>Draw Alert Area</button>
+  <button #remove *ngIf="!showDrawBtn" ion-button block class="auth-action-button sub-menu-button" (click)="removeCircle()"><ion-icon name="close-circle"></ion-icon>Remove</button>
+  <ion-item>
+  <ion-datetime #startdatepicker text-center (ionChange)="startDateChanged($event)" displayFormat="DD-MM-YYYY HH:mm" [(ngModel)]="startdate" placeholder="Select the First Date/Time"></ion-datetime>
+  </ion-item>
+  <ion-item>
+  <ion-datetime #enddatepicker text-center (ionChange)="endDateChanged($event)" displayFormat="DD-MM-YYYY HH:mm" [(ngModel)]="enddate" placeholder="Select the Last Date/Time"></ion-datetime>
+  </ion-item>
+  <button ion-button block class="auth-action-button sub-menu-button" (click)="searchPins()"><ion-icon name="search"></ion-icon> Show Location Pins</button>
+</ion-content>

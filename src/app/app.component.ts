@@ -7,6 +7,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { TabsNavigationPage } from '../pages/tabs-navigation/tabs-navigation';
 import { WalkthroughPage } from '../pages/walkthrough/walkthrough';
 import { SettingsPage } from '../pages/settings/settings';
+import { Events } from 'ionic-angular';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +16,7 @@ import { SettingsPage } from '../pages/settings/settings';
 export class MyApp {
 
   @ViewChild(Nav) nav: Nav;
+  @ViewChild('selectdevice') selectDevice;
 
   // make WalkthroughPage the root (or first) page
   rootPage: any = WalkthroughPage;
@@ -22,13 +24,15 @@ export class MyApp {
 
   pages: Array<{title: string, icon: string, component: any}>;
   pushPages: Array<{title: string, icon: string, component: any}>;
+  devices : any;
 
   constructor(
     platform: Platform,
     public menu: MenuController,
     public app: App,
     public splashScreen: SplashScreen,
-    public statusBar: StatusBar
+    public statusBar: StatusBar,
+    public events: Events
   ) {
     platform.ready().then(() => {
       // Okay, so the platform is ready and our plugins are available.
@@ -44,6 +48,14 @@ export class MyApp {
     this.pushPages = [
       { title: 'Settings', icon: 'settings', component: SettingsPage }
     ];
+
+    events.subscribe('app:selectdevice', (device_id) => {
+      this.selectDevice.value = device_id;
+    });
+
+    events.subscribe('app:pollingdevices', (devices) => {
+      this.devices = devices;
+    })
   }
 
   openPage(page) {
@@ -59,5 +71,14 @@ export class MyApp {
     this.menu.close();
     // rootNav is now deprecated (since beta 11) (https://forum.ionicframework.com/t/cant-access-rootnav-after-upgrade-to-beta-11/59889)
     this.app.getRootNav().push(page.component);
+  }
+
+  onDeviceChange(selectedValue: any) {
+    this.events.publish('map:devicechange', selectedValue);
+  }
+
+  gotoAddWatch() {
+    this.menu.close();
+    this.events.publish('map:addwatch');
   }
 }

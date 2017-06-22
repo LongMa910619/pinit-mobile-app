@@ -1,10 +1,20 @@
-<ion-menu [content]="content" [swipeEnabled]="false">
+<ion-menu [content]="content" [swipeEnabled]="false" side="left">
   <ion-content class="menu-content">
     <ion-list class="menu-list">
+      <ion-item>
+        <ion-select #selectdevice class="myCustomSelect" [(ngModel)]="gender" (ionChange)="onDeviceChange($event)">
+          <ion-option value="" selected>Select Watch</ion-option>
+          <ion-option *ngFor="let device of devices" value="{{device.id}}">{{ device.friendly_name }}</ion-option>
+        </ion-select>
+      </ion-item>
+      <!--
+      <button ion-item (click)="gotoAddWatch()">+ Add Watch</button>
+       -->
       <button ion-item detail-none *ngFor="let page of pages" (click)="openPage(page)">
         <ion-icon *ngIf="page.icon" name="{{page.icon}}" item-left></ion-icon>
         {{page.title}}
       </button>
+
       <button ion-item detail-none *ngFor="let page of pushPages" (click)="pushPage(page)">
         <ion-icon *ngIf="page.icon" name="{{page.icon}}" item-left></ion-icon>
         {{page.title}}
