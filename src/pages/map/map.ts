@@ -29,6 +29,9 @@ export class MapPage {
   @ViewChild('map') mapElement: ElementRef;
 
   map: any;
+  alert_circle: any;
+  fLat: any;
+  fLng: any;
 
   pages: Array<{title: string, icon: string, component: any}>;
 
@@ -93,7 +96,6 @@ export class MapPage {
   }
 
   polling() {
-
     this.http.get(this.POLLING_URL, { headers: this.contentHeader })
       .subscribe(
         data => {
@@ -144,6 +146,28 @@ export class MapPage {
 
     this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
 
+    this.map.data.addListener('click', function(event) {
+      console.log(event.latLng.lat());
+      console.log(event.latLng.lng());
+      this.fLat = event.latLng.lat();
+      this.fLng = event.latLng.lng();
+      //this.drawCircle();
+      //this.drawCircle(event.latLng.lat(), event.latLng.lng());
+      this.alert_circle = new google.maps.Circle({
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35,
+        map: this.map,
+        center: { lat: parseFloat(this.fLat), lng: parseFloat(this.fLng) },
+        radius: 5 * 10, // meters (default as 50m)
+        editable: true,
+        draggable: true
+      });
+      console.log(event.feature.getProperty('device_id'));
+    });
+
     if(this.platform.is('cordova')){
       this.nativeStorage.getItem('authorize_identity').then(
         data => {
@@ -183,6 +207,33 @@ export class MapPage {
     }
   }
 
+  drawCircle(){
+    if(this.alert_circle == null){
+      this.alert_circle = new google.maps.Circle({
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.35,
+        map: this.map,
+        center: { lat: parseFloat(this.fLat), lng: parseFloat(this.fLng) },
+        radius: 5 * 10, // meters (default as 50m)
+        editable: true,
+        draggable: true
+      });
 
+      //this.map.setZoom(this.map.getZoom() - 3);
+
+      //init_ajax_save_circle_geofence(this.alert_circle.getRadius(), this.alert_circle.getCenter().lat(), this.alert_circle.getCenter().lng());
+      //init_circle_geofence_callback();
+
+      //$(this).hide();
+      //$('#remove-circle-btn').fadeIn();
+    }
+  }
+
+  removeCircle(){
+
+  }
 
 }
