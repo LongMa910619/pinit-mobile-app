@@ -5,6 +5,8 @@ import { Storage } from '@ionic/storage';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { OneSignal } from '@ionic-native/onesignal';
 import { SettingsPage } from '../settings/settings';
+import { AddWatchPage } from '../add-watch/add-watch';
+import { SubMenuPage } from '../sub-menu/sub-menu';
 
 import { Http, Headers } from '@angular/http';
 
@@ -44,7 +46,7 @@ export class MapPage {
     public navCtrl: NavController,
     public navParams: NavParams,
     public menu: MenuController,
-    public  loadingCtrl: LoadingController,
+    public loadingCtrl: LoadingController,
     private http: Http,
     private nativeStorage: NativeStorage,
     private storage: Storage,
@@ -76,12 +78,11 @@ export class MapPage {
 
       this.oneSignal.endInit();
      }
-
   }
 
   openPage(page) {
     // close the menu when clicking a link from the menu
-    this.menu.close();
+    //this.menu.close();
     // navigate to the new page if it is not the current page
     this.nav.setRoot(page.component);
   }
@@ -144,16 +145,18 @@ export class MapPage {
       mapTypeId: google.maps.MapTypeId.ROADMAP
     }
 
+    let navCtrl = this.navCtrl;
+
     this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
 
     this.map.data.addListener('click', function(event) {
-      console.log(event.latLng.lat());
-      console.log(event.latLng.lng());
       this.fLat = event.latLng.lat();
       this.fLng = event.latLng.lng();
+      console.log(navCtrl);
+      navCtrl.push(SubMenuPage);
       //this.drawCircle();
       //this.drawCircle(event.latLng.lat(), event.latLng.lng());
-      this.alert_circle = new google.maps.Circle({
+      /*this.alert_circle = new google.maps.Circle({
         strokeColor: '#FF0000',
         strokeOpacity: 0.8,
         strokeWeight: 2,
@@ -164,7 +167,7 @@ export class MapPage {
         radius: 5 * 10, // meters (default as 50m)
         editable: true,
         draggable: true
-      });
+      });*/
       console.log(event.feature.getProperty('device_id'));
     });
 
@@ -236,4 +239,8 @@ export class MapPage {
 
   }
 
+  gotoAddWatch() {
+    console.log("Click AddWatch Button.")
+    this.navCtrl.push(SubMenuPage);
+  }
 }

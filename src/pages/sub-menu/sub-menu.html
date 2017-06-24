@@ -1,0 +1,12 @@
+<ion-header class="sub-menu-header auth-header">
+  <ion-navbar>
+    <ion-title>AAA</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="sub-menu-content auth-content">
+  <form class="sub-menu-form auth-form" [formGroup]="add_watch" (ngSubmit)="addWatch()">
+    <button ion-button block class="auth-action-button sub-menu-button"><ion-icon name="notifications"></ion-icon> Draw Alert Area</button>
+    <button ion-button block class="auth-action-button sub-menu-button"><ion-icon name="search"></ion-icon> Show Location Pins</button>
+  </form>
+</ion-content>
