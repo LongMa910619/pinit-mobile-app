@@ -29,6 +29,7 @@ export class MapPage {
 
   @ViewChild(Nav) nav: Nav;
   @ViewChild('map') mapElement: ElementRef;
+  @ViewChild('selectdevice') selectDevice;
 
   map: any;
   alert_circle: any;
@@ -36,9 +37,12 @@ export class MapPage {
   fLng: any;
 
   pages: Array<{title: string, icon: string, component: any}>;
+  devices : any;
 
   // POLLING_URL: string = "http://localhost:3000/api/v1/map/polling";
   POLLING_URL: string = "https://pinit-staging-eu.herokuapp.com/api/v1/map/polling";
+  DEVICES_URL: string = "https://pinit-staging-eu.herokuapp.com/api/v1/devices";
+  FILTER_URL : string = "https://pinit-staging-eu.herokuapp.com/api/v1/devices/";
 
   contentHeader: Headers = new Headers({"Content-Type": "application/json"});
 
@@ -87,53 +91,97 @@ export class MapPage {
     this.nav.setRoot(page.component);
   }
 
-
   ionViewDidLoad() {
-    console.log('ionViewDidLoad MapPage');
-
-    console.log(this.contentHeader);
-
+    //console.log('ionViewDidLoad MapPage');
+    //console.log(this.contentHeader);
     this.loadMap();
   }
 
+  removeMapData() {
+    let datas:any = this.map.data;
+    this.map.data.forEach(function(feature) {
+      datas.remove(feature);
+    });
+    this.map.data = datas;
+  }
+
+  markView(response: any) {
+    this.removeMapData();
+    //create bounds
+    let bounds = new google.maps.LatLngBounds();
+    this.map.data.addGeoJson(JSON.parse(response.result));
+
+    // Check each feature and fit into bound
+    this.map.data.forEach(function(feature) {
+      // this.processPoints(feature.getGeometry(), bounds.extend, bounds);
+      if (feature.getGeometry() instanceof google.maps.LatLng) {
+        bounds.extend.call(bounds, feature.getGeometry());
+      } else if (feature.getGeometry() instanceof google.maps.Data.Point) {
+        bounds.extend.call(bounds, feature.getGeometry().get());
+      } else {
+        feature.getGeometry().getArray().forEach(function(g) {
+          this.processPoints(g, bounds.extend, bounds);
+        });
+      }
+    });
+    this.map.fitBounds(bounds);
+
+    this.map.data.setStyle(function(feature) {
+      return {
+        icon: feature.getProperty('icon')
+      };
+    });
+  }
+
   polling() {
-    this.http.get(this.POLLING_URL, { headers: this.contentHeader })
-      .subscribe(
+    this.http.get(this.POLLING_URL, { headers: this.contentHeader }).subscribe(
+      data => {
+        let response = data.json();
+        //this.removeMapData();
+        this.markView(response);
+      }
+    );
+  }
+
+  pollingDevices() {
+    this.http.get(this.DEVICES_URL, { headers : this.contentHeader }).subscribe(
+      data => {
+        this.devices = data.json();
+      }
+    );
+  }
+
+  init_ajax_call(device_id: string) {
+    if (device_id.length > 0) {
+      let strURL = this.FILTER_URL + device_id + "/last_pin";
+
+      this.http.get(strURL, { headers: this.contentHeader }).subscribe(
         data => {
           let response = data.json();
-          console.log(response);
-
-          // this.map.data.forEach(function(feature) {
-          //   this.map.data.remove(feature);
-          // });
-
-         //create bounds
-          let bounds  = new  google.maps.LatLngBounds();
-          this.map.data.addGeoJson(JSON.parse(response.result));
-
-          // Check each feature and fit into bound
-          this.map.data.forEach(function(feature) {
-            // this.processPoints(feature.getGeometry(), bounds.extend, bounds);
-            if (feature.getGeometry() instanceof google.maps.LatLng) {
-              bounds.extend.call(bounds, feature.getGeometry());
-            } else if (feature.getGeometry() instanceof google.maps.Data.Point) {
-              bounds.extend.call(bounds, feature.getGeometry().get());
-            } else {
-              feature.getGeometry().getArray().forEach(function(g) {
-                this.processPoints(g, bounds.extend, bounds);
-              });
-            }
-          });
-          this.map.fitBounds(bounds);
-
-          this.map.data.setStyle(function(feature) {
-            return {
-              icon: feature.getProperty('icon')
-            };
-          });
-
+          if (response.msg) {
+            alert(response.msg);
+          } else {
+            this.markView(response);
+          }
         }
       );
+    } else {
+      this.polling();
+    }
+  }
+
+  onDeviceChange(selectedValue: any) {
+    this.init_ajax_call(selectedValue);
+
+    if(selectedValue == ''){                                    ////select [select all] item
+      if(this.alert_circle != null){
+        this.alert_circle.setMap(null);
+        this.alert_circle = null;
+      }
+    }else{                                                      ////select a device
+      // $('#device-name').html($(this).find('option:selected').text());
+      //init_ajax_get_circle_geofence();
+    }
   }
 
   loadMap(){
@@ -149,26 +197,11 @@ export class MapPage {
 
     this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
 
-    this.map.data.addListener('click', function(event) {
+    this.map.data.addListener('click', (event) => {
       this.fLat = event.latLng.lat();
       this.fLng = event.latLng.lng();
-      console.log(navCtrl);
       navCtrl.push(SubMenuPage);
-      //this.drawCircle();
-      //this.drawCircle(event.latLng.lat(), event.latLng.lng());
-      /*this.alert_circle = new google.maps.Circle({
-        strokeColor: '#FF0000',
-        strokeOpacity: 0.8,
-        strokeWeight: 2,
-        fillColor: '#FF0000',
-        fillOpacity: 0.35,
-        map: this.map,
-        center: { lat: parseFloat(this.fLat), lng: parseFloat(this.fLng) },
-        radius: 5 * 10, // meters (default as 50m)
-        editable: true,
-        draggable: true
-      });*/
-      console.log(event.feature.getProperty('device_id'));
+      this.selectDevice.value = event.feature.getProperty('device_id');
     });
 
     if(this.platform.is('cordova')){
@@ -186,9 +219,10 @@ export class MapPage {
         this.contentHeader.append('client', data['client']);
         this.contentHeader.append('uid', data['uid']);
 
-        console.log(data['access-token']);
-        console.log(data['client']);
-        console.log(data['uid']);
+        //console.log(data['access-token']);
+        //console.log(data['client']);
+        //console.log(data['uid']);
+        this.pollingDevices();
         this.polling();
         Observable.interval(2000 * 60).subscribe(x => {
           this.polling();
@@ -210,8 +244,13 @@ export class MapPage {
     }
   }
 
+  selectOnlyOneDevice()
+  {
+    
+  }
+
   drawCircle(){
-    if(this.alert_circle == null){
+//    if(this.alert_circle == null){
       this.alert_circle = new google.maps.Circle({
         strokeColor: '#FF0000',
         strokeOpacity: 0.8,
@@ -232,7 +271,7 @@ export class MapPage {
 
       //$(this).hide();
       //$('#remove-circle-btn').fadeIn();
-    }
+    //}
   }
 
   removeCircle(){
