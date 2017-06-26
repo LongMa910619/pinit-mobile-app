@@ -7,6 +7,7 @@ import { OneSignal } from '@ionic-native/onesignal';
 import { SettingsPage } from '../settings/settings';
 import { AddWatchPage } from '../add-watch/add-watch';
 import { SubMenuPage } from '../sub-menu/sub-menu';
+import { Events } from 'ionic-angular';
 
 import { Http, Headers } from '@angular/http';
 
@@ -35,6 +36,7 @@ export class MapPage {
   alert_circle: any;
   fLat: any;
   fLng: any;
+  showDrawBtn: boolean;
 
   pages: Array<{title: string, icon: string, component: any}>;
   devices : any;
@@ -42,7 +44,10 @@ export class MapPage {
   // POLLING_URL: string = "http://localhost:3000/api/v1/map/polling";
   POLLING_URL: string = "https://pinit-staging-eu.herokuapp.com/api/v1/map/polling";
   DEVICES_URL: string = "https://pinit-staging-eu.herokuapp.com/api/v1/devices";
-  FILTER_URL : string = "https://pinit-staging-eu.herokuapp.com/api/v1/devices/";
+  LASTPIN_URL: string = "https://pinit-staging-eu.herokuapp.com/api/v1/devices/";
+  FILTER_URL : string = "https://pinit-staging-eu.herokuapp.com/api/v1/geofence/";
+  SEARCHPIN_URL: string = "https://pinit-staging-eu.herokuapp.com/api/v1/map/search_pins";
+
 
   contentHeader: Headers = new Headers({"Content-Type": "application/json"});
 
@@ -56,7 +61,8 @@ export class MapPage {
     private storage: Storage,
     public  toastCtrl: ToastController,
     private oneSignal: OneSignal,
-    private platform: Platform
+    private platform: Platform,
+    public events: Events
   ) {
 
     this.pages = [
@@ -81,7 +87,23 @@ export class MapPage {
       });
 
       this.oneSignal.endInit();
-     }
+    }
+
+    events.subscribe('map:drawcircle', () => {
+      this.drawCircle();
+    });     
+
+    events.subscribe('map:removecircle', () => {
+      this.removeCircle();
+    });
+
+    events.subscribe('map:searchpins', (start, end) => {
+      this.init_ajax_search_pins(start, end);
+    });
+
+    events.subscribe('map:addwatch', (name, lccid, sn, pwd) => {
+      this.add_watch(name, lccid, sn, pwd);
+    })
   }
 
   openPage(page) {
@@ -153,7 +175,7 @@ export class MapPage {
 
   init_ajax_call(device_id: string) {
     if (device_id.length > 0) {
-      let strURL = this.FILTER_URL + device_id + "/last_pin";
+      let strURL = this.LASTPIN_URL + device_id + "/last_pin";
 
       this.http.get(strURL, { headers: this.contentHeader }).subscribe(
         data => {
@@ -169,7 +191,7 @@ export class MapPage {
       this.polling();
     }
   }
-
+  //When change Select Watch Combobox.
   onDeviceChange(selectedValue: any) {
     this.init_ajax_call(selectedValue);
 
@@ -180,27 +202,24 @@ export class MapPage {
       }
     }else{                                                      ////select a device
       // $('#device-name').html($(this).find('option:selected').text());
-      //init_ajax_get_circle_geofence();
+      this.init_ajax_get_circle_geofence();
     }
   }
 
   loadMap(){
     let latLng = new google.maps.LatLng(-34.9290, 138.6010);
-
     let mapOptions = {
       center: latLng,
       zoom: 15,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     }
 
-    let navCtrl = this.navCtrl;
-
     this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
 
     this.map.data.addListener('click', (event) => {
       this.fLat = event.latLng.lat();
       this.fLng = event.latLng.lng();
-      navCtrl.push(SubMenuPage);
+      this.navCtrl.push(SubMenuPage, { showDrawBtn: this.showDrawBtn });
       this.selectDevice.value = event.feature.getProperty('device_id');
     });
 
@@ -244,13 +263,8 @@ export class MapPage {
     }
   }
 
-  selectOnlyOneDevice()
-  {
-    
-  }
-
   drawCircle(){
-//    if(this.alert_circle == null){
+    if(this.alert_circle == null){
       this.alert_circle = new google.maps.Circle({
         strokeColor: '#FF0000',
         strokeOpacity: 0.8,
@@ -265,21 +279,119 @@ export class MapPage {
       });
 
       //this.map.setZoom(this.map.getZoom() - 3);
-
-      //init_ajax_save_circle_geofence(this.alert_circle.getRadius(), this.alert_circle.getCenter().lat(), this.alert_circle.getCenter().lng());
-      //init_circle_geofence_callback();
-
-      //$(this).hide();
-      //$('#remove-circle-btn').fadeIn();
-    //}
+      this.init_ajax_save_circle_geofence(this.alert_circle.getRadius(), this.alert_circle.getCenter().lat(), this.alert_circle.getCenter().lng());
+      this.showDrawBtn = false;
+    }
   }
 
   removeCircle(){
+    this.alert_circle.setMap(null);
+    this.alert_circle = null;
+    this.init_ajax_remove_circle_geofence();
+    this.showDrawBtn = true;
+  }
 
+  init_ajax_save_circle_geofence(radius, lat, lng) {
+    let strURL = this.FILTER_URL + this.selectDevice.value;
+    let json = JSON.stringify({radius: radius, lat: lat, lng: lng});
+
+    this.http.put(strURL, json, { headers: this.contentHeader }).subscribe(
+      data => {
+      }
+    );
+  }
+
+  init_ajax_get_circle_geofence() {
+    this.http.get(this.FILTER_URL + this.selectDevice.value, { headers: this.contentHeader }).subscribe(
+      data => {
+        let response = data.json();
+        this.showDrawBtn = true;
+
+        if (this.alert_circle != null) {
+          this.alert_circle.setMap(null);
+          this.alert_circle = null;
+        }
+
+        if (response.msg) {
+          alert(response.msg)
+        } else if (response.success) {
+          this.alert_circle = new google.maps.Circle({
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#F25F5C',
+            fillOpacity: 0.35,
+            map: this.map,
+            center: { lat: parseFloat(this.fLat), lng: parseFloat(this.fLng) },
+            radius: 5 * 10, // meters (default as 5km)
+            editable: true,
+            draggable: true
+          });
+          //this.init_circle_geofence_callback()
+          this.showDrawBtn = false;
+        }
+      }
+    );
+  }
+
+  init_ajax_remove_circle_geofence() {
+    this.http.delete(this.FILTER_URL + this.selectDevice.value, { headers: this.contentHeader }).subscribe(
+      data => {
+      }
+    );
+  }
+
+  init_ajax_search_pins(start, end){
+    this.removeMapData();
+    let strURL = this.SEARCHPIN_URL/* + "?start=" + start + "&end=" + end*/;
+    let json = JSON.stringify({device_id: this.selectDevice.value, from: start, to: end});
+
+    this.http.patch(strURL, json, { headers: this.contentHeader }).subscribe(
+      data => {
+        let response = data.json();
+        console.log(response);
+        if (response.success) {
+          var bounds = new google.maps.LatLngBounds();
+          this.map.data.addGeoJson(JSON.parse(response.result));
+
+          // Check each feature and fit into bound
+          this.map.data.forEach(function(feature) {
+            this.processPoints(feature.getGeometry(), bounds.extend, bounds);
+          });
+          this.map.fitBounds(bounds);
+
+          this.map.data.setStyle(function(feature) {
+            return {
+              icon: feature.getProperty('icon')
+            };
+          });
+        }else if(response.no_data){
+          alert("No pins found!");
+        }else{
+          alert("Something went wrong!");
+        }
+      }
+    );
+  }
+
+  add_watch(name, id, sn, pwd) {
+    let strURL = this.DEVICES_URL;
+    //let json = JSON.stringify({account: "b70206f2-346e-40e4-9d00-1a678097fac2", added_by_user: "319f6e72-e520-4637-89be-11ac9ec0a6f3", friendly_name: name, friendly_colour: "#43ac6a", lccid: id, serial_number: sn, password:pwd});
+    let json = JSON.stringify({device : {friendly_name: name, friendly_colour: "#43ac6a", lccid: id, serial_number: sn, password:pwd}});
+
+    console.log(json);
+    this.http.post(strURL, json, { headers: this.contentHeader }).subscribe(
+      data => {
+        console.log(data);
+      },
+      err => {
+        console.log(err);
+      }
+    );
   }
 
   gotoAddWatch() {
     console.log("Click AddWatch Button.")
-    this.navCtrl.push(SubMenuPage);
+    this.navCtrl.push(AddWatchPage);
   }
 }

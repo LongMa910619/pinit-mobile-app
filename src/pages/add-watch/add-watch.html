@@ -7,17 +7,17 @@
 <ion-content class="add-watch-content auth-content">
   <form class="add-watch-form auth-form" [formGroup]="add_watch" (ngSubmit)="addWatch()">
     <ion-item>
-      <ion-input type="text" placeholder="Friendly Name"></ion-input>
+      <ion-input #nametxt type="text" placeholder="Friendly Name"></ion-input>
     </ion-item>
       <!--color-picker [hexColor]="'#FF0000'" (colorChanged)="setColor($event)"></color-picker-->
     <ion-item>
-      <ion-input type="text" placeholder="lccid" ></ion-input>
+      <ion-input #lccidtxt type="text" placeholder="lccid" ></ion-input>
     </ion-item>
     <ion-item>
-      <ion-input type="text" placeholder="Serial Number"></ion-input>
+      <ion-input #serialnumbertxt type="text" placeholder="Serial Number"></ion-input>
     </ion-item>
     <ion-item>
-      <ion-input type="password" placeholder="Password"></ion-input>
+      <ion-input #passwordtxt type="password" placeholder="Password"></ion-input>
     </ion-item>
     <button ion-button block class="auth-action-button add-watch-button" type="submit" [disabled]="!add_watch.valid">Save Watch</button>
   </form>
