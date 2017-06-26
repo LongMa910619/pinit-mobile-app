@@ -30,16 +30,17 @@ export class MapPage {
 
   @ViewChild(Nav) nav: Nav;
   @ViewChild('map') mapElement: ElementRef;
-  @ViewChild('selectdevice') selectDevice;
+  ////@ViewChild('selectdevice') selectDevice;
 
   map: any;
   alert_circle: any;
   fLat: any;
   fLng: any;
   showDrawBtn: boolean;
+  device_id: string;
 
   pages: Array<{title: string, icon: string, component: any}>;
-  devices : any;
+  ////devices : any;
 
   // POLLING_URL: string = "http://localhost:3000/api/v1/map/polling";
   POLLING_URL: string = "https://pinit-staging-eu.herokuapp.com/api/v1/map/polling";
@@ -105,6 +106,14 @@ export class MapPage {
       this.add_watch(name, lccid, sn, pwd);
     })
 
+    events.subscribe('map:devicechange', (selectedValue) => {
+      this.onDeviceChange(selectedValue);
+    })
+
+    events.subscribe('map:addwatch', () => {
+      this.gotoAddWatch();
+    });
+
     this.showDrawBtn = true;
   }
 
@@ -149,7 +158,8 @@ export class MapPage {
       }
     });
 
-    let exist_zoom_for_device = localStorage.getItem(this.selectDevice.value);
+    ////let exist_zoom_for_device = localStorage.getItem(this.selectDevice.value);
+    let exist_zoom_for_device = localStorage.getItem(this.device_id);
     if(exist_zoom_for_device != null){
       this.map.setCenter(bounds.getCenter());
       this.map.setZoom(parseInt(exist_zoom_for_device));
@@ -179,7 +189,8 @@ export class MapPage {
   pollingDevices() {
     this.http.get(this.DEVICES_URL, { headers : this.contentHeader }).subscribe(
       data => {
-        this.devices = data.json();
+        ////this.devices = data.json();
+        this.events.publish('app:pollingdevices', data.json());
       }
     );
   }
@@ -204,6 +215,7 @@ export class MapPage {
   }
   //When change Select Watch Combobox.
   onDeviceChange(selectedValue: any) {
+    this.device_id = selectedValue;
     this.init_ajax_call(selectedValue);
 
     if(selectedValue == ''){                                    ////select [select all] item
@@ -231,12 +243,15 @@ export class MapPage {
       this.fLat = event.latLng.lat();
       this.fLng = event.latLng.lng();
       this.navCtrl.push(SubMenuPage, { showDrawBtn: this.showDrawBtn });
-      this.selectDevice.value = event.feature.getProperty('device_id');
+      ////this.selectDevice.value = event.feature.getProperty('device_id');
+      this.events.publish('app:selectdevice', event.feature.getProperty('device_id'));
+      //this.device_id = event.feature.getProperty('device_id');
     });
 
     this.map.addListener('zoom_changed', (event) => {
-      if (this.selectDevice.value.length > 0) {
-        localStorage.setItem(this.selectDevice.value, this.map.getZoom());
+      ////if (this.selectDevice.value.length > 0) {
+      if (this.device_id != null && this.device_id.length > 0) {
+        localStorage.setItem(this.device_id, this.map.getZoom());
       }
     });
 
@@ -309,7 +324,8 @@ export class MapPage {
   }
 
   init_ajax_save_circle_geofence(radius, lat, lng) {
-    let strURL = this.FILTER_URL + this.selectDevice.value;
+    ////let strURL = this.FILTER_URL + this.selectDevice.value;
+    let strURL = this.FILTER_URL + this.device_id;
     let json = JSON.stringify({radius: radius, lat: lat, lng: lng});
 
     this.http.put(strURL, json, { headers: this.contentHeader }).subscribe(
@@ -319,7 +335,8 @@ export class MapPage {
   }
 
   init_ajax_get_circle_geofence() {
-    this.http.get(this.FILTER_URL + this.selectDevice.value, { headers: this.contentHeader }).subscribe(
+    ////this.http.get(this.FILTER_URL + this.selectDevice.value, { headers: this.contentHeader }).subscribe(
+    this.http.get(this.FILTER_URL + this.device_id, { headers: this.contentHeader }).subscribe(
       data => {
         let response = data.json();
         this.showDrawBtn = true;
@@ -352,7 +369,8 @@ export class MapPage {
   }
 
   init_ajax_remove_circle_geofence() {
-    this.http.delete(this.FILTER_URL + this.selectDevice.value, { headers: this.contentHeader }).subscribe(
+    ////this.http.delete(this.FILTER_URL + this.selectDevice.value, { headers: this.contentHeader }).subscribe(
+    this.http.delete(this.FILTER_URL + this.device_id, { headers: this.contentHeader }).subscribe(
       data => {
       }
     );
@@ -360,7 +378,8 @@ export class MapPage {
 
   init_ajax_search_pins(start, end){
     this.removeMapData();
-    let strURL = this.SEARCHPIN_URL + "?device_id=" + this.selectDevice.value + "&from=" + start + "&to=" + end;
+    ////let strURL = this.SEARCHPIN_URL + "?device_id=" + this.selectDevice.value + "&from=" + start + "&to=" + end;
+    let strURL = this.SEARCHPIN_URL + "?device_id=" + this.device_id + "&from=" + start + "&to=" + end;
     //let json = JSON.stringify({device_id: this.selectDevice.value, from: start, to: end});
     console.log(strURL);
     this.http.get(strURL, { headers: this.contentHeader }).subscribe(

@@ -11,11 +11,11 @@
       <ion-icon name="menu"></ion-icon>
     </button>
     <ion-title style="float:left;height:45px">PinIT GPS</ion-title>
-    <ion-select #selectdevice style="float:left" [(ngModel)]="device" (ionChange)="onDeviceChange($event)">
+    <!--ion-select #selectdevice style="float:left" [(ngModel)]="device" (ionChange)="onDeviceChange($event)">
       <ion-option value="" selected>Select Watch</ion-option>
       <ion-option *ngFor="let device of devices" value="{{device.id}}">{{ device.friendly_name }}</ion-option>
     </ion-select>
-    <button ion-button (click)="gotoAddWatch()">+ Add Watch</button>
+    <button ion-button (click)="gotoAddWatch()">+ Add Watch</button-->
   </ion-navbar>
 
 </ion-header>
