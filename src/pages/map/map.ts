@@ -104,6 +104,8 @@ export class MapPage {
     events.subscribe('map:addwatch', (name, lccid, sn, pwd) => {
       this.add_watch(name, lccid, sn, pwd);
     })
+
+    this.showDrawBtn = true;
   }
 
   openPage(page) {
@@ -146,7 +148,16 @@ export class MapPage {
         });
       }
     });
-    this.map.fitBounds(bounds);
+
+    let exist_zoom_for_device = localStorage.getItem(this.selectDevice.value);
+    if(exist_zoom_for_device != null){
+      this.map.setCenter(bounds.getCenter());
+      this.map.setZoom(parseInt(exist_zoom_for_device));
+    }else{
+      this.map.fitBounds(bounds);
+    }
+    
+    //this.map.fitBounds(bounds);
 
     this.map.data.setStyle(function(feature) {
       return {
@@ -221,6 +232,12 @@ export class MapPage {
       this.fLng = event.latLng.lng();
       this.navCtrl.push(SubMenuPage, { showDrawBtn: this.showDrawBtn });
       this.selectDevice.value = event.feature.getProperty('device_id');
+    });
+
+    this.map.addListener('zoom_changed', (event) => {
+      if (this.selectDevice.value.length > 0) {
+        localStorage.setItem(this.selectDevice.value, this.map.getZoom());
+      }
     });
 
     if(this.platform.is('cordova')){
@@ -343,10 +360,10 @@ export class MapPage {
 
   init_ajax_search_pins(start, end){
     this.removeMapData();
-    let strURL = this.SEARCHPIN_URL/* + "?start=" + start + "&end=" + end*/;
-    let json = JSON.stringify({device_id: this.selectDevice.value, from: start, to: end});
-
-    this.http.patch(strURL, json, { headers: this.contentHeader }).subscribe(
+    let strURL = this.SEARCHPIN_URL + "?device_id=" + this.selectDevice.value + "&from=" + start + "&to=" + end;
+    //let json = JSON.stringify({device_id: this.selectDevice.value, from: start, to: end});
+    console.log(strURL);
+    this.http.get(strURL, { headers: this.contentHeader }).subscribe(
       data => {
         let response = data.json();
         console.log(response);
@@ -356,7 +373,16 @@ export class MapPage {
 
           // Check each feature and fit into bound
           this.map.data.forEach(function(feature) {
-            this.processPoints(feature.getGeometry(), bounds.extend, bounds);
+            //this.processPoints(feature.getGeometry(), bounds.extend, bounds);
+            if (feature.getGeometry() instanceof google.maps.LatLng) {
+              bounds.extend.call(bounds, feature.getGeometry());
+            } else if (feature.getGeometry() instanceof google.maps.Data.Point) {
+              bounds.extend.call(bounds, feature.getGeometry().get());
+            } else {
+              feature.getGeometry().getArray().forEach(function(g) {
+                this.processPoints(g, bounds.extend, bounds);
+              });
+            }
           });
           this.map.fitBounds(bounds);
 
@@ -376,16 +402,12 @@ export class MapPage {
 
   add_watch(name, id, sn, pwd) {
     let strURL = this.DEVICES_URL;
-    //let json = JSON.stringify({account: "b70206f2-346e-40e4-9d00-1a678097fac2", added_by_user: "319f6e72-e520-4637-89be-11ac9ec0a6f3", friendly_name: name, friendly_colour: "#43ac6a", lccid: id, serial_number: sn, password:pwd});
     let json = JSON.stringify({device : {friendly_name: name, friendly_colour: "#43ac6a", lccid: id, serial_number: sn, password:pwd}});
 
     console.log(json);
     this.http.post(strURL, json, { headers: this.contentHeader }).subscribe(
       data => {
-        console.log(data);
-      },
-      err => {
-        console.log(err);
+        this.pollingDevices();
       }
     );
   }
