@@ -27,7 +27,7 @@ export class AddWatchPage {
   }
 
   addWatch(){
-    this.events.publish('map:addwatch', this.name_txt._value, this.lccid_txt._value, this.sn_txt._value, this.pwd_txt._value/*, this.color_pck._value*/);
+    this.events.publish('map:addingDevice', this.name_txt._value, this.lccid_txt._value, this.sn_txt._value, this.pwd_txt._value/*, this.color_pck._value*/);
     this.nav.pop();
   }
 

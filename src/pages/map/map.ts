@@ -102,16 +102,16 @@ export class MapPage {
       this.init_ajax_search_pins(start, end);
     });
 
-    events.subscribe('map:addwatch', (name, lccid, sn, pwd) => {
-      this.add_watch(name, lccid, sn, pwd);
-    })
-
     events.subscribe('map:devicechange', (selectedValue) => {
       this.onDeviceChange(selectedValue);
     })
 
     events.subscribe('map:addwatch', () => {
       this.gotoAddWatch();
+    });
+
+    events.subscribe('map:addingDevice', (name, id, sn, pwd) => {
+      this.add_watch(name, id, sn, pwd);
     });
 
     this.showDrawBtn = true;
@@ -432,7 +432,6 @@ export class MapPage {
   }
 
   gotoAddWatch() {
-    console.log("Click AddWatch Button.")
     this.navCtrl.push(AddWatchPage);
   }
 }
