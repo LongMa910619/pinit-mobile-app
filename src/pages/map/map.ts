@@ -3,6 +3,7 @@ import { IonicPage, Nav, MenuController, NavController, NavParams, LoadingContro
 
 import { Storage } from '@ionic/storage';
 import { NativeStorage } from '@ionic-native/native-storage';
+import { Geolocation } from '@ionic-native/geolocation';
 import { OneSignal } from '@ionic-native/onesignal';
 import { SettingsPage } from '../settings/settings';
 import { AddWatchPage } from '../add-watch/add-watch';
@@ -38,6 +39,8 @@ export class MapPage {
   fLng: any;
   showDrawBtn: boolean;
   device_id: string;
+  defaultLat: any;
+  defaultLng: any;
 
   pages: Array<{title: string, icon: string, component: any}>;
   ////devices : any;
@@ -63,6 +66,7 @@ export class MapPage {
     public  toastCtrl: ToastController,
     private oneSignal: OneSignal,
     private platform: Platform,
+    private geolocation: Geolocation,
     public events: Events
   ) {
 
@@ -74,6 +78,7 @@ export class MapPage {
     ];
 
     if(this.platform.is('cordova')){
+      // Onesignal
       this.oneSignal.startInit('8afb6c4c-51ed-4332-ae8a-0079a0d8d4f2', '');
       this.oneSignal.inFocusDisplaying(this.oneSignal.OSInFocusDisplayOption.InAppAlert);
 
@@ -90,9 +95,18 @@ export class MapPage {
       this.oneSignal.endInit();
     }
 
+    this.geolocation.getCurrentPosition().then((resp) => {
+      console.log(resp.coords.latitude);
+      console.log(resp.coords.longitude);
+      this.defaultLat = resp.coords.latitude;
+      this.defaultLng = resp.coords.longitude;
+    }).catch((error) => {
+      console.log('Error getting location', error);
+    });
+
     events.subscribe('map:drawcircle', () => {
       this.drawCircle();
-    });     
+    });
 
     events.subscribe('map:removecircle', () => {
       this.removeCircle();
@@ -166,7 +180,7 @@ export class MapPage {
     }else{
       this.map.fitBounds(bounds);
     }
-    
+
     //this.map.fitBounds(bounds);
 
     this.map.data.setStyle(function(feature) {
@@ -230,7 +244,7 @@ export class MapPage {
   }
 
   loadMap(){
-    let latLng = new google.maps.LatLng(-34.9290, 138.6010);
+    let latLng = new google.maps.LatLng(this.defaultLat, this.defaultLng);
     let mapOptions = {
       center: latLng,
       zoom: 15,
