@@ -21,6 +21,7 @@ import { ProfileService } from '../pages/profile/profile.service';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { OneSignal } from '@ionic-native/onesignal';
 import { Geolocation } from '@ionic-native/geolocation';
+import { CallNumber } from '@ionic-native/call-number';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpModule } from '@angular/http';
@@ -73,6 +74,7 @@ import { PreloadImage } from '../components/preload-image/preload-image';
     StatusBar,
     OneSignal,
     Geolocation,
+    CallNumber,
     NativeStorage,
     ProfileService
   ],

@@ -15,12 +15,12 @@ export class SubMenuPage {
   @ViewChild('remove') removebutton;
   @ViewChild('startdatepicker') startpicker;
   @ViewChild('enddatepicker') endpicker;
-  
+
   add_watch: FormGroup;
   main_page: { component: any };
   showDrawBtn: boolean;
 
-  constructor( 
+  constructor(
     public nav: NavController,
     private navParams: NavParams,
     public events: Events
@@ -34,7 +34,7 @@ export class SubMenuPage {
 
     events.subscribe('submenu:setvalues', () => {
       this.setValues();
-    });     
+    });
   }
 
   setValues() {
@@ -61,4 +61,9 @@ export class SubMenuPage {
     this.events.publish('map:searchpins', this.startpicker._text, this.endpicker._text);
     this.nav.pop();
   }
+
+  callDeviceNumber() {
+    this.events.publish('map:callDeviceNumber');
+  }
+
 }

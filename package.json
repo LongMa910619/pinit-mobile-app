@@ -21,6 +21,7 @@
     "@angular/platform-browser-dynamic": "4.1.2",
     "@angular/platform-server": "4.1.2",
     "@angular/router": "4.1.2",
+    "@ionic-native/call-number": "^3.12.1",
     "@ionic-native/core": "^3.12.1",
     "@ionic-native/geolocation": "3.4.4",
     "@ionic-native/native-storage": "^3.4.4",

@@ -9,6 +9,7 @@ import { SettingsPage } from '../settings/settings';
 import { AddWatchPage } from '../add-watch/add-watch';
 import { SubMenuPage } from '../sub-menu/sub-menu';
 import { Events } from 'ionic-angular';
+import { CallNumber } from '@ionic-native/call-number';
 
 import { Http, Headers } from '@angular/http';
 
@@ -39,6 +40,7 @@ export class MapPage {
   fLng: any;
   showDrawBtn: boolean;
   device_id: string;
+  device_number: string;
   defaultLat: any;
   defaultLng: any;
 
@@ -67,6 +69,7 @@ export class MapPage {
     private oneSignal: OneSignal,
     private platform: Platform,
     private geolocation: Geolocation,
+    private callNumber: CallNumber,
     public events: Events
   ) {
 
@@ -128,20 +131,28 @@ export class MapPage {
       this.add_watch(name, id, sn, pwd);
     });
 
+    events.subscribe('map:callDeviceNumber', () => {
+      this.callDeviceNumber();
+    });
+
     this.showDrawBtn = true;
   }
 
   openPage(page) {
-    // close the menu when clicking a link from the menu
     //this.menu.close();
     // navigate to the new page if it is not the current page
     this.nav.setRoot(page.component);
   }
 
   ionViewDidLoad() {
-    //console.log('ionViewDidLoad MapPage');
-    //console.log(this.contentHeader);
     this.loadMap();
+  }
+
+  callDeviceNumber() {
+    console.log(this.device_number);
+    this.callNumber.callNumber(this.device_number, true)
+      .then(() => console.log('Launched dialer!'))
+      .catch(() => console.log('Error launching dialer'));
   }
 
   removeMapData() {
@@ -157,6 +168,7 @@ export class MapPage {
     //create bounds
     let bounds = new google.maps.LatLngBounds();
     this.map.data.addGeoJson(JSON.parse(response.result));
+    console.log(response.result);
 
     // Check each feature and fit into bound
     this.map.data.forEach(function(feature) {
@@ -259,6 +271,8 @@ export class MapPage {
       this.navCtrl.push(SubMenuPage, { showDrawBtn: this.showDrawBtn });
       ////this.selectDevice.value = event.feature.getProperty('device_id');
       this.events.publish('app:selectdevice', event.feature.getProperty('device_id'));
+      this.device_number = event.feature.getProperty('msisdn');
+      console.log(this.device_number);
       //this.device_id = event.feature.getProperty('device_id');
     });
 
