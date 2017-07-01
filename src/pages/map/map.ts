@@ -4,6 +4,7 @@ import { IonicPage, Nav, MenuController, NavController, NavParams, LoadingContro
 import { Storage } from '@ionic/storage';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { OneSignal } from '@ionic-native/onesignal';
+//import { OneSignal } from 'cordova/plugins/OneSignal';
 import { SettingsPage } from '../settings/settings';
 import { AddWatchPage } from '../add-watch/add-watch';
 import { SubMenuPage } from '../sub-menu/sub-menu';
@@ -12,6 +13,7 @@ import { Events } from 'ionic-angular';
 import { Http, Headers } from '@angular/http';
 
 import {Observable} from 'rxjs/Rx';
+import {Device} from 'ionic-native';
 
 /**
  * Generated class for the MapPage page.
@@ -20,7 +22,8 @@ import {Observable} from 'rxjs/Rx';
  * on Ionic pages and navigation.
  */
 
- declare var google;
+declare var google;
+declare var cordova;
 
 @Component({
   selector: 'page-map',
@@ -48,6 +51,7 @@ export class MapPage {
   LASTPIN_URL: string = "https://pinit-staging-eu.herokuapp.com/api/v1/devices/";
   FILTER_URL : string = "https://pinit-staging-eu.herokuapp.com/api/v1/geofence/";
   SEARCHPIN_URL: string = "https://pinit-staging-eu.herokuapp.com/api/v1/map/search_pins";
+  NOTIFICASTION_URL:string = "https://pinit-staging-eu.herokuapp.com/api/v1/users/update_device";
 
 
   contentHeader: Headers = new Headers({"Content-Type": "application/json"});
@@ -73,7 +77,40 @@ export class MapPage {
       { title: 'Logout', icon: 'exit', component: SettingsPage }
     ];
 
-    if(this.platform.is('cordova')){
+    if (this.platform.is('ios') || this.platform.is('android')) {
+      let mobile_uuid = Device.uuid;
+      let mobile_type = (this.platform.is('ios') ? 'ios' : (this.platform.is('android') ? 'android' : 'unknown'));
+      
+      cordova.plugins.OneSignal.startInit('8afb6c4c-51ed-4332-ae8a-0079a0d8d4f2', '')
+      .getPermissionSubscriptionState(function(status) {
+        let strURL = this.NOTIFICASTION_URL;
+        let json = JSON.stringify({device : {device_id: mobile_uuid, mobile_type: mobile_type}});
+
+        alert(json);
+        this.http.post(strURL, json, { headers: this.contentHeader }).subscribe(
+          data => {
+            
+          }
+        );
+      })
+      .endInit();
+      /*this.oneSignal.startInit('8afb6c4c-51ed-4332-ae8a-0079a0d8d4f2', '');
+      this.oneSignal.inFocusDisplaying(this.oneSignal.OSInFocusDisplayOption.InAppAlert);
+
+      this.oneSignal.handleNotificationReceived().subscribe(() => {
+        // do something when notification is received
+        alert("Receive notification");
+      });
+
+      this.oneSignal.handleNotificationOpened().subscribe(() => {
+        // do something when a notification is opened
+        alert("Open notification");
+      });
+
+      this.oneSignal.endInit();*/
+    }
+
+    /*if(this.platform.is('cordova')){
       this.oneSignal.startInit('8afb6c4c-51ed-4332-ae8a-0079a0d8d4f2', '');
       this.oneSignal.inFocusDisplaying(this.oneSignal.OSInFocusDisplayOption.InAppAlert);
 
@@ -88,7 +125,7 @@ export class MapPage {
       });
 
       this.oneSignal.endInit();
-    }
+    }*/
 
     events.subscribe('map:drawcircle', () => {
       this.drawCircle();
@@ -423,7 +460,7 @@ export class MapPage {
     let strURL = this.DEVICES_URL;
     let json = JSON.stringify({device : {friendly_name: name, friendly_colour: "#43ac6a", lccid: id, serial_number: sn, password:pwd}});
 
-    console.log(json);
+    //console.log(json);
     this.http.post(strURL, json, { headers: this.contentHeader }).subscribe(
       data => {
         this.pollingDevices();
