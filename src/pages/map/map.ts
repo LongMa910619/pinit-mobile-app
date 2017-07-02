@@ -10,6 +10,7 @@ import { AddWatchPage } from '../add-watch/add-watch';
 import { SubMenuPage } from '../sub-menu/sub-menu';
 import { Events } from 'ionic-angular';
 import { CallNumber } from '@ionic-native/call-number';
+import {Device} from 'ionic-native';
 
 import { Http, Headers } from '@angular/http';
 
@@ -22,7 +23,8 @@ import {Observable} from 'rxjs/Rx';
  * on Ionic pages and navigation.
  */
 
- declare var google;
+declare var google;
+declare var cordova;
 
 @Component({
   selector: 'page-map',
@@ -43,6 +45,8 @@ export class MapPage {
   device_number: string;
   defaultLat: any;
   defaultLng: any;
+  sub_menu_title: string;
+  loading: any;
 
   pages: Array<{title: string, icon: string, component: any}>;
   ////devices : any;
@@ -53,6 +57,7 @@ export class MapPage {
   LASTPIN_URL: string = "https://pinit-staging-eu.herokuapp.com/api/v1/devices/";
   FILTER_URL : string = "https://pinit-staging-eu.herokuapp.com/api/v1/geofence/";
   SEARCHPIN_URL: string = "https://pinit-staging-eu.herokuapp.com/api/v1/map/search_pins";
+  NOTIFICASTION_URL:string = "https://pinit-staging-eu.herokuapp.com/api/v1/users/update_device";
 
 
   contentHeader: Headers = new Headers({"Content-Type": "application/json"});
@@ -80,7 +85,36 @@ export class MapPage {
       { title: 'Logout', icon: 'exit', component: SettingsPage }
     ];
 
-    if(this.platform.is('cordova')){
+    if (this.platform.is('ios') || this.platform.is('android')) {
+      let mobile_uuid = Device.uuid;
+      let mobile_type = (this.platform.is('ios') ? 'ios' : (this.platform.is('android') ? 'android' : 'unknown'));
+      
+      cordova.plugins.OneSignal.startInit('8afb6c4c-51ed-4332-ae8a-0079a0d8d4f2', '')
+      .getPermissionSubscriptionState(function(status) {
+        let strURL = this.NOTIFICASTION_URL;
+        let json = JSON.stringify({device : {device_id: mobile_uuid, mobile_type: mobile_type}});
+
+        alert(json);
+        this.http.post(strURL, json, { headers: this.contentHeader }).subscribe(
+          data => {
+            
+          },
+          err => {
+            if(err.status == 401 && err.statusText == 'Unauthorized'){
+              let toast = this.toastCtrl.create({
+                message: 'Invalid credentials, please try again.',
+                duration: 3000
+              });
+              toast.present();
+            }
+            this.loading.dismiss();
+          }
+        );
+      })
+      .endInit();
+    }
+
+    /*if(this.platform.is('cordova')){
       // Onesignal
       this.oneSignal.startInit('8afb6c4c-51ed-4332-ae8a-0079a0d8d4f2', '');
       this.oneSignal.inFocusDisplaying(this.oneSignal.OSInFocusDisplayOption.InAppAlert);
@@ -96,11 +130,11 @@ export class MapPage {
       });
 
       this.oneSignal.endInit();
-    }
+    }*/
 
     this.geolocation.getCurrentPosition().then((resp) => {
-      console.log(resp.coords.latitude);
-      console.log(resp.coords.longitude);
+      //console.log(resp.coords.latitude);
+      //console.log(resp.coords.longitude);
       this.defaultLat = resp.coords.latitude;
       this.defaultLng = resp.coords.longitude;
     }).catch((error) => {
@@ -135,7 +169,12 @@ export class MapPage {
       this.callDeviceNumber();
     });
 
+    events.subscribe('sub-menu:title', (title) => {
+      this.sub_menu_title = title;
+    });
+
     this.showDrawBtn = true;
+    this.loading = this.loadingCtrl.create();
   }
 
   openPage(page) {
@@ -168,7 +207,7 @@ export class MapPage {
     //create bounds
     let bounds = new google.maps.LatLngBounds();
     this.map.data.addGeoJson(JSON.parse(response.result));
-    console.log(response.result);
+    //console.log(response.result);
 
     // Check each feature and fit into bound
     this.map.data.forEach(function(feature) {
@@ -206,8 +245,19 @@ export class MapPage {
     this.http.get(this.POLLING_URL, { headers: this.contentHeader }).subscribe(
       data => {
         let response = data.json();
+        //console.log(response);
         //this.removeMapData();
         this.markView(response);
+      },
+      err => {
+        if(err.status == 401 && err.statusText == 'Unauthorized'){
+          let toast = this.toastCtrl.create({
+            message: 'Invalid credentials, please try again.',
+            duration: 3000
+          });
+          toast.present();
+        }
+        this.loading.dismiss();
       }
     );
   }
@@ -217,6 +267,16 @@ export class MapPage {
       data => {
         ////this.devices = data.json();
         this.events.publish('app:pollingdevices', data.json());
+      },
+      err => {
+        if(err.status == 401 && err.statusText == 'Unauthorized'){
+          let toast = this.toastCtrl.create({
+            message: 'Invalid credentials, please try again.',
+            duration: 3000
+          });
+          toast.present();
+        }
+        this.loading.dismiss();
       }
     );
   }
@@ -233,6 +293,16 @@ export class MapPage {
           } else {
             this.markView(response);
           }
+        },
+        err => {
+          if(err.status == 401 && err.statusText == 'Unauthorized'){
+            let toast = this.toastCtrl.create({
+              message: 'Invalid credentials, please try again.',
+              duration: 3000
+            });
+            toast.present();
+          }
+          this.loading.dismiss();
         }
       );
     } else {
@@ -268,8 +338,8 @@ export class MapPage {
     this.map.data.addListener('click', (event) => {
       this.fLat = event.latLng.lat();
       this.fLng = event.latLng.lng();
-      this.navCtrl.push(SubMenuPage, { showDrawBtn: this.showDrawBtn });
       this.events.publish('app:selectdevice', event.feature.getProperty('device_id'));
+      this.navCtrl.push(SubMenuPage, { showDrawBtn: this.showDrawBtn, title: this.sub_menu_title });
       this.device_number = event.feature.getProperty('msisdn');
     });
 
@@ -355,6 +425,16 @@ export class MapPage {
 
     this.http.put(strURL, json, { headers: this.contentHeader }).subscribe(
       data => {
+      },
+      err => {
+        if(err.status == 401 && err.statusText == 'Unauthorized'){
+          let toast = this.toastCtrl.create({
+            message: 'Invalid credentials, please try again.',
+            duration: 3000
+          });
+          toast.present();
+        }
+        this.loading.dismiss();
       }
     );
   }
@@ -389,6 +469,16 @@ export class MapPage {
           //this.init_circle_geofence_callback()
           this.showDrawBtn = false;
         }
+      },
+      err => {
+        if(err.status == 401 && err.statusText == 'Unauthorized'){
+          let toast = this.toastCtrl.create({
+            message: 'Invalid credentials, please try again.',
+            duration: 3000
+          });
+          toast.present();
+        }
+        this.loading.dismiss();
       }
     );
   }
@@ -397,6 +487,16 @@ export class MapPage {
     ////this.http.delete(this.FILTER_URL + this.selectDevice.value, { headers: this.contentHeader }).subscribe(
     this.http.delete(this.FILTER_URL + this.device_id, { headers: this.contentHeader }).subscribe(
       data => {
+      },
+      err => {
+        if(err.status == 401 && err.statusText == 'Unauthorized'){
+          let toast = this.toastCtrl.create({
+            message: 'Invalid credentials, please try again.',
+            duration: 3000
+          });
+          toast.present();
+        }
+        this.loading.dismiss();
       }
     );
   }
@@ -406,11 +506,11 @@ export class MapPage {
     ////let strURL = this.SEARCHPIN_URL + "?device_id=" + this.selectDevice.value + "&from=" + start + "&to=" + end;
     let strURL = this.SEARCHPIN_URL + "?device_id=" + this.device_id + "&from=" + start + "&to=" + end;
     //let json = JSON.stringify({device_id: this.selectDevice.value, from: start, to: end});
-    console.log(strURL);
+    //console.log(strURL);
     this.http.get(strURL, { headers: this.contentHeader }).subscribe(
       data => {
         let response = data.json();
-        console.log(response);
+        //console.log(response);
         if (response.success) {
           var bounds = new google.maps.LatLngBounds();
           this.map.data.addGeoJson(JSON.parse(response.result));
@@ -440,6 +540,16 @@ export class MapPage {
         }else{
           alert("Something went wrong!");
         }
+      },
+      err => {
+        if(err.status == 401 && err.statusText == 'Unauthorized'){
+          let toast = this.toastCtrl.create({
+            message: 'Invalid credentials, please try again.',
+            duration: 3000
+          });
+          toast.present();
+        }
+        this.loading.dismiss();
       }
     );
   }
@@ -448,10 +558,20 @@ export class MapPage {
     let strURL = this.DEVICES_URL;
     let json = JSON.stringify({device : {friendly_name: name, friendly_colour: "#43ac6a", lccid: id, serial_number: sn, password:pwd}});
 
-    console.log(json);
+    //console.log(json);
     this.http.post(strURL, json, { headers: this.contentHeader }).subscribe(
       data => {
         this.pollingDevices();
+      },
+      err => {
+        if(err.status == 401 && err.statusText == 'Unauthorized'){
+          let toast = this.toastCtrl.create({
+            message: 'Invalid credentials, please try again.',
+            duration: 3000
+          });
+          toast.present();
+        }
+        this.loading.dismiss();
       }
     );
   }

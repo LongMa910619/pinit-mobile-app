@@ -52,7 +52,9 @@ export class MyApp {
     ];
 
     events.subscribe('app:selectdevice', (device_id) => {
-      this.selectDevice.value = device_id;
+      if (device_id != this.selectDevice.value) {
+        this.selectDevice.value = device_id;
+      }
     });
 
     events.subscribe('app:pollingdevices', (devices) => {
@@ -77,6 +79,7 @@ export class MyApp {
 
   onDeviceChange(selectedValue: any) {
     this.events.publish('map:devicechange', selectedValue);
+    this.events.publish('sub-menu:title', this.selectDevice._text);
   }
 
   gotoAddWatch() {

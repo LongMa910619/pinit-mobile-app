@@ -15,12 +15,13 @@ export class SubMenuPage {
   @ViewChild('remove') removebutton;
   @ViewChild('startdatepicker') startpicker;
   @ViewChild('enddatepicker') endpicker;
-
+  
   add_watch: FormGroup;
   main_page: { component: any };
   showDrawBtn: boolean;
   startdate: String = new Date(new Date().setDate(new Date().getDate() - 30)).toISOString();
   enddate: string = new Date().toISOString();
+  title: string = "";
 
   constructor(
     public nav: NavController,
@@ -33,6 +34,8 @@ export class SubMenuPage {
     });
 
     this.showDrawBtn = navParams.get('showDrawBtn');
+    this.title = navParams.get('title');
+    //console.log(this.title);
 
     events.subscribe('submenu:setvalues', () => {
       this.setValues();
