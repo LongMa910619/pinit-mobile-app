@@ -57,7 +57,7 @@ export class MapPage {
   LASTPIN_URL: string = "https://pinit-staging-eu.herokuapp.com/api/v1/devices/";
   FILTER_URL : string = "https://pinit-staging-eu.herokuapp.com/api/v1/geofence/";
   SEARCHPIN_URL: string = "https://pinit-staging-eu.herokuapp.com/api/v1/map/search_pins";
-  NOTIFICASTION_URL:string = "https://pinit-staging-eu.herokuapp.com/api/v1/users/update_device";
+  NOTIFICATION_URL:string = "https://pinit-staging-eu.herokuapp.com/api/v1/users/update_device";
 
 
   contentHeader: Headers = new Headers({"Content-Type": "application/json"});
@@ -88,16 +88,16 @@ export class MapPage {
     if (this.platform.is('ios') || this.platform.is('android')) {
       let mobile_uuid = Device.uuid;
       let mobile_type = (this.platform.is('ios') ? 'ios' : (this.platform.is('android') ? 'android' : 'unknown'));
-      
+
       cordova.plugins.OneSignal.startInit('8afb6c4c-51ed-4332-ae8a-0079a0d8d4f2', '')
       .getPermissionSubscriptionState(function(status) {
-        let strURL = this.NOTIFICASTION_URL;
+        let strURL = this.NOTIFICATION_URL;
         let json = JSON.stringify({device : {device_id: mobile_uuid, mobile_type: mobile_type}});
 
         alert(json);
         this.http.post(strURL, json, { headers: this.contentHeader }).subscribe(
           data => {
-            
+
           },
           err => {
             if(err.status == 401 && err.statusText == 'Unauthorized'){
