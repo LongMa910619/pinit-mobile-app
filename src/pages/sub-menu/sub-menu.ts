@@ -19,6 +19,8 @@ export class SubMenuPage {
   add_watch: FormGroup;
   main_page: { component: any };
   showDrawBtn: boolean;
+  startdate: String = new Date(new Date().setDate(new Date().getDate() - 30)).toISOString();
+  enddate: string = new Date().toISOString();
 
   constructor(
     public nav: NavController,
@@ -38,7 +40,6 @@ export class SubMenuPage {
   }
 
   setValues() {
-
   }
 
   drawCircle() {

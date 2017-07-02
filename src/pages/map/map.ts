@@ -150,7 +150,7 @@ export class MapPage {
 
   callDeviceNumber() {
     console.log(this.device_number);
-    this.callNumber.callNumber(this.device_number, true)
+    this.callNumber.callNumber("00" + this.device_number, true)
       .then(() => console.log('Launched dialer!'))
       .catch(() => console.log('Error launching dialer'));
   }
@@ -269,11 +269,8 @@ export class MapPage {
       this.fLat = event.latLng.lat();
       this.fLng = event.latLng.lng();
       this.navCtrl.push(SubMenuPage, { showDrawBtn: this.showDrawBtn });
-      ////this.selectDevice.value = event.feature.getProperty('device_id');
       this.events.publish('app:selectdevice', event.feature.getProperty('device_id'));
       this.device_number = event.feature.getProperty('msisdn');
-      console.log(this.device_number);
-      //this.device_id = event.feature.getProperty('device_id');
     });
 
     this.map.addListener('zoom_changed', (event) => {

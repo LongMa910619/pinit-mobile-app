@@ -5,6 +5,8 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 
 import { TabsNavigationPage } from '../pages/tabs-navigation/tabs-navigation';
+import { MapPage } from '../pages/map/map';
+
 import { WalkthroughPage } from '../pages/walkthrough/walkthrough';
 import { SettingsPage } from '../pages/settings/settings';
 import { Events } from 'ionic-angular';
@@ -42,7 +44,7 @@ export class MyApp {
     });
 
     this.pages = [
-      { title: 'Home', icon: 'home', component: TabsNavigationPage }
+      { title: 'Home', icon: 'home', component: MapPage }
     ];
 
     this.pushPages = [

@@ -114,6 +114,13 @@ export class SettingsPage {
   // Functionality
   logout() {
     // navigate to the new page if it is not the current page
+    if(this.platform.is('cordova')){
+      this.nativeStorage.setItem('authorize_identity', null);
+      this.nativeStorage.setItem('user', null);
+    }else{
+      this.storage.set('authorize_identity', null);
+      this.storage.set('user', null);
+    }
     this.nav.setRoot(this.rootPage);
   }
 
