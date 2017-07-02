@@ -102,7 +102,7 @@ export class MapPage {
           err => {
             if(err.status == 401 && err.statusText == 'Unauthorized'){
               let toast = this.toastCtrl.create({
-                message: 'Invalid credentials, please try again.',
+                message: 'API request unsuccessful',
                 duration: 3000
               });
               toast.present();
@@ -252,7 +252,7 @@ export class MapPage {
       err => {
         if(err.status == 401 && err.statusText == 'Unauthorized'){
           let toast = this.toastCtrl.create({
-            message: 'Invalid credentials, please try again.',
+            message: 'API request unsuccessful',
             duration: 3000
           });
           toast.present();
@@ -271,7 +271,7 @@ export class MapPage {
       err => {
         if(err.status == 401 && err.statusText == 'Unauthorized'){
           let toast = this.toastCtrl.create({
-            message: 'Invalid credentials, please try again.',
+            message: 'API request unsuccessful',
             duration: 3000
           });
           toast.present();
@@ -297,7 +297,7 @@ export class MapPage {
         err => {
           if(err.status == 401 && err.statusText == 'Unauthorized'){
             let toast = this.toastCtrl.create({
-              message: 'Invalid credentials, please try again.',
+              message: 'API request unsuccessful',
               duration: 3000
             });
             toast.present();
@@ -429,7 +429,7 @@ export class MapPage {
       err => {
         if(err.status == 401 && err.statusText == 'Unauthorized'){
           let toast = this.toastCtrl.create({
-            message: 'Invalid credentials, please try again.',
+            message: 'API request unsuccessful',
             duration: 3000
           });
           toast.present();
@@ -473,7 +473,7 @@ export class MapPage {
       err => {
         if(err.status == 401 && err.statusText == 'Unauthorized'){
           let toast = this.toastCtrl.create({
-            message: 'Invalid credentials, please try again.',
+            message: 'API request unsuccessful',
             duration: 3000
           });
           toast.present();
@@ -491,7 +491,7 @@ export class MapPage {
       err => {
         if(err.status == 401 && err.statusText == 'Unauthorized'){
           let toast = this.toastCtrl.create({
-            message: 'Invalid credentials, please try again.',
+            message: 'API request unsuccessful',
             duration: 3000
           });
           toast.present();
@@ -544,7 +544,7 @@ export class MapPage {
       err => {
         if(err.status == 401 && err.statusText == 'Unauthorized'){
           let toast = this.toastCtrl.create({
-            message: 'Invalid credentials, please try again.',
+            message: 'API request unsuccessful',
             duration: 3000
           });
           toast.present();
@@ -566,7 +566,7 @@ export class MapPage {
       err => {
         if(err.status == 401 && err.statusText == 'Unauthorized'){
           let toast = this.toastCtrl.create({
-            message: 'Invalid credentials, please try again.',
+            message: 'API request unsuccessful',
             duration: 3000
           });
           toast.present();
