@@ -85,34 +85,34 @@ export class MapPage {
       { title: 'Logout', icon: 'exit', component: SettingsPage }
     ];
 
-    if (this.platform.is('ios') || this.platform.is('android')) {
-      let mobile_uuid = Device.uuid;
-      let mobile_type = (this.platform.is('ios') ? 'ios' : (this.platform.is('android') ? 'android' : 'unknown'));
+    // if (this.platform.is('ios') || this.platform.is('android')) {
+    //   let mobile_uuid = Device.uuid;
+    //   let mobile_type = (this.platform.is('ios') ? 'ios' : (this.platform.is('android') ? 'android' : 'unknown'));
 
-      cordova.plugins.OneSignal.startInit('8afb6c4c-51ed-4332-ae8a-0079a0d8d4f2', '')
-      .getPermissionSubscriptionState(function(status) {
-        let strURL = this.NOTIFICATION_URL;
-        let json = JSON.stringify({device : {device_id: mobile_uuid, mobile_type: mobile_type}});
+    //   cordova.plugins.OneSignal.startInit('8afb6c4c-51ed-4332-ae8a-0079a0d8d4f2', '')
+    //   .getPermissionSubscriptionState(function(status) {
+    //     let strURL = this.NOTIFICATION_URL;
+    //     let json = JSON.stringify({device : {device_id: mobile_uuid, mobile_type: mobile_type}});
 
-        alert(json);
-        this.http.post(strURL, json, { headers: this.contentHeader }).subscribe(
-          data => {
+    //     alert(json);
+    //     this.http.post(strURL, json, { headers: this.contentHeader }).subscribe(
+    //       data => {
 
-          },
-          err => {
-            if(err.status == 401 && err.statusText == 'Unauthorized'){
-              let toast = this.toastCtrl.create({
-                message: 'API request unsuccessful',
-                duration: 3000
-              });
-              toast.present();
-            }
-            this.loading.dismiss();
-          }
-        );
-      })
-      .endInit();
-    }
+    //       },
+    //       err => {
+    //         if(err.status == 401 && err.statusText == 'Unauthorized'){
+    //           let toast = this.toastCtrl.create({
+    //             message: 'API request unsuccessful',
+    //             duration: 3000
+    //           });
+    //           toast.present();
+    //         }
+    //         this.loading.dismiss();
+    //       }
+    //     );
+    //   })
+    //   .endInit();
+    // }
 
     /*if(this.platform.is('cordova')){
       // Onesignal
