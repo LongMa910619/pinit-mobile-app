@@ -55,24 +55,24 @@ export class SettingsPage {
 
   ionViewDidLoad() {
 
-    if(this.platform.is('cordova')){
+    // if(this.platform.is('cordova')){
 
-      this.nativeStorage.getItem('user').then(
-        data => {
-          this.profile = data.user;
-        },
-        error => console.error(error)
-      );
+    //   this.nativeStorage.getItem('user').then(
+    //     data => {
+    //       this.profile = data.user;
+    //     },
+    //     error => console.error(error)
+    //   );
 
-      this.nativeStorage.getItem('authorize_identity').then(
-        data => {
-          this.contentHeader.append('access-token', data['access-token']);
-          this.contentHeader.append('client', data['client']);
-          this.contentHeader.append('uid', data['uid']);
-        },
-        error => console.error(error)
-      );
-     }else{
+    //   this.nativeStorage.getItem('authorize_identity').then(
+    //     data => {
+    //       this.contentHeader.append('access-token', data['access-token']);
+    //       this.contentHeader.append('client', data['client']);
+    //       this.contentHeader.append('uid', data['uid']);
+    //     },
+    //     error => console.error(error)
+    //   );
+    //  }else{
       this.storage.get('user').then((value) => {
         this.profile = value.user;
       });
@@ -82,24 +82,24 @@ export class SettingsPage {
         this.contentHeader.append('client', data['client']);
         this.contentHeader.append('uid', data['uid']);
       });
-     }
+     // }
 
   }
 
   ionViewWillEnter(){
-    if(this.platform.is('cordova')){
-      this.nativeStorage.getItem('user').then(
-        value => {
-          if(value){
-            // do nothing is authorized
-          }else{
-            this.nav.setRoot(this.rootPage);
-            // unauthorized
-          }
-        },
-        error => console.error(error)
-      );
-    }else{
+    // if(this.platform.is('cordova')){
+    //   this.nativeStorage.getItem('user').then(
+    //     value => {
+    //       if(value){
+    //         // do nothing is authorized
+    //       }else{
+    //         this.nav.setRoot(this.rootPage);
+    //         // unauthorized
+    //       }
+    //     },
+    //     error => console.error(error)
+    //   );
+    // }else{
       this.storage.get('user').then((value) => {
         if(value){
           // do nothing is authorized
@@ -108,19 +108,19 @@ export class SettingsPage {
           // unauthorized
         }
       });
-    }
+    // }
   }
 
   // Functionality
   logout() {
     // navigate to the new page if it is not the current page
-    if(this.platform.is('cordova')){
-      this.nativeStorage.setItem('authorize_identity', null);
-      this.nativeStorage.setItem('user', null);
-    }else{
+    // if(this.platform.is('cordova')){
+    //   this.nativeStorage.setItem('authorize_identity', null);
+    //   this.nativeStorage.setItem('user', null);
+    // }else{
       this.storage.set('authorize_identity', null);
       this.storage.set('user', null);
-    }
+    // }
     this.nav.setRoot(this.rootPage);
   }
 
@@ -138,11 +138,11 @@ export class SettingsPage {
       )
       .subscribe(
         data => {
-          if(this.platform.is('cordova')){
-            this.nativeStorage.setItem('user', data);
-           }else{
+          // if(this.platform.is('cordova')){
+          //   this.nativeStorage.setItem('user', data);
+          //  }else{
             this.storage.set('user', data);
-           }
+           // }
           this.loading.dismiss();
         },
         err => {

@@ -9,7 +9,7 @@ import { SettingsPage } from '../settings/settings';
 import { AddWatchPage } from '../add-watch/add-watch';
 import { SubMenuPage } from '../sub-menu/sub-menu';
 import { Events } from 'ionic-angular';
-import { CallNumber } from '@ionic-native/call-number';
+//import { CallNumber } from '@ionic-native/call-number';
 import {Device} from 'ionic-native';
 
 import { Http, Headers } from '@angular/http';
@@ -24,7 +24,6 @@ import {Observable} from 'rxjs/Rx';
  */
 
 declare var google;
-declare var cordova;
 
 @Component({
   selector: 'page-map',
@@ -42,7 +41,7 @@ export class MapPage {
   fLng: any;
   showDrawBtn: boolean;
   device_id: string;
-  device_number: string;
+//  device_number: string;
   defaultLat: any;
   defaultLng: any;
   sub_menu_title: string;
@@ -74,7 +73,7 @@ export class MapPage {
     private oneSignal: OneSignal,
     private platform: Platform,
     private geolocation: Geolocation,
-    private callNumber: CallNumber,
+//    private callNumber: CallNumber,
     public events: Events
   ) {
 
@@ -85,56 +84,44 @@ export class MapPage {
       { title: 'Logout', icon: 'exit', component: SettingsPage }
     ];
 
-    // if (this.platform.is('ios') || this.platform.is('android')) {
-    //   let mobile_uuid = Device.uuid;
-    //   let mobile_type = (this.platform.is('ios') ? 'ios' : (this.platform.is('android') ? 'android' : 'unknown'));
+      var notificationOpenedCallback = function(jsonData) {
+        alert('notificationOpenedCallback: ' + JSON.stringify(jsonData));
+      };
 
-    //   cordova.plugins.OneSignal.startInit('8afb6c4c-51ed-4332-ae8a-0079a0d8d4f2', '')
-    //   .getPermissionSubscriptionState(function(status) {
-    //     let strURL = this.NOTIFICATION_URL;
-    //     let json = JSON.stringify({device : {device_id: mobile_uuid, mobile_type: mobile_type}});
+      var notificationPermissionCallback = function(status) {
+        /*let mobile_uuid = Device.uuid;
+        let mobile_type = (this.platform.is('ios') ? 'ios' : (this.platform.is('android') ? 'android' : 'unknown'));
+        
+        let strURL = this.NOTIFICATION_URL;
+        let json = JSON.stringify({device : {device_id: mobile_uuid, mobile_type: mobile_type}});
 
-    //     alert(json);
-    //     this.http.post(strURL, json, { headers: this.contentHeader }).subscribe(
-    //       data => {
+        alert(json);
+        this.http.post(strURL, json, { headers: this.contentHeader }).subscribe(
+          data => {
 
-    //       },
-    //       err => {
-    //         if(err.status == 401 && err.statusText == 'Unauthorized'){
-    //           let toast = this.toastCtrl.create({
-    //             message: 'API request unsuccessful',
-    //             duration: 3000
-    //           });
-    //           toast.present();
-    //         }
-    //         this.loading.dismiss();
-    //       }
-    //     );
-    //   })
-    //   .endInit();
-    // }
+          },
+          err => {
+            if(err.status == 401 && err.statusText == 'Unauthorized'){
+              let toast = this.toastCtrl.create({
+                message: 'API request unsuccessful',
+                duration: 3000
+              });
+              toast.present();
+            }
+            this.loading.dismiss();
+          }
+        );*/
+      };
 
-    /*if(this.platform.is('cordova')){
-      // Onesignal
-      this.oneSignal.startInit('8afb6c4c-51ed-4332-ae8a-0079a0d8d4f2', '');
-      this.oneSignal.inFocusDisplaying(this.oneSignal.OSInFocusDisplayOption.InAppAlert);
-
-      this.oneSignal.handleNotificationReceived().subscribe(() => {
-        // do something when notification is received
-        alert("Receive notification");
-      });
-
-      this.oneSignal.handleNotificationOpened().subscribe(() => {
-        // do something when a notification is opened
-        alert("Open notification");
-      });
-
-      this.oneSignal.endInit();
-    }*/
+    if (this.platform.is('ios') || this.platform.is('android')) {
+      window["plugins"].OneSignal
+        .startInit("6bb0475c-21ab-486d-b58e-d78d0bf1e45a", "373548359818")
+        .handleNotificationOpened(notificationOpenedCallback)
+        //.getPermissionSubscriptionState(notificationPermissionCallback)
+        .endInit();
+    }
 
     this.geolocation.getCurrentPosition().then((resp) => {
-      //console.log(resp.coords.latitude);
-      //console.log(resp.coords.longitude);
       this.defaultLat = resp.coords.latitude;
       this.defaultLng = resp.coords.longitude;
     }).catch((error) => {
@@ -188,10 +175,10 @@ export class MapPage {
   }
 
   callDeviceNumber() {
-    console.log(this.device_number);
+    /*console.log(this.device_number);
     this.callNumber.callNumber("00" + this.device_number, true)
       .then(() => console.log('Launched dialer!'))
-      .catch(() => console.log('Error launching dialer'));
+      .catch(() => console.log('Error launching dialer'));*/
   }
 
   removeMapData() {
@@ -323,6 +310,7 @@ export class MapPage {
       // $('#device-name').html($(this).find('option:selected').text());
       this.init_ajax_get_circle_geofence();
     }
+    google.maps.event.trigger(this.map, 'resize');
   }
 
   loadMap(){
@@ -339,8 +327,8 @@ export class MapPage {
       this.fLat = event.latLng.lat();
       this.fLng = event.latLng.lng();
       this.events.publish('app:selectdevice', event.feature.getProperty('device_id'));
-      this.navCtrl.push(SubMenuPage, { showDrawBtn: this.showDrawBtn, title: this.sub_menu_title });
-      this.device_number = event.feature.getProperty('msisdn');
+      this.navCtrl.push(SubMenuPage, { showDrawBtn: this.showDrawBtn, title: this.sub_menu_title, device_number: event.feature.getProperty('msisdn') });
+      //this.device_number = event.feature.getProperty('msisdn');
     });
 
     this.map.addListener('zoom_changed', (event) => {
@@ -350,16 +338,16 @@ export class MapPage {
       }
     });
 
-    if(this.platform.is('cordova')){
-      this.nativeStorage.getItem('authorize_identity').then(
-        data => {
-          this.contentHeader.append('access-token', data['access-token']);
-          this.contentHeader.append('client', data['client']);
-          this.contentHeader.append('uid', data['uid']);
-        },
-        error => console.error(error)
-      );
-     }else{
+    // if(this.platform.is('cordova')){
+    //   this.nativeStorage.getItem('authorize_identity').then(
+    //     data => {
+    //       this.contentHeader.append('access-token', data['access-token']);
+    //       this.contentHeader.append('client', data['client']);
+    //       this.contentHeader.append('uid', data['uid']);
+    //     },
+    //     error => console.error(error)
+    //   );
+    //  }else{
       this.storage.get('authorize_identity').then((data) => {
         this.contentHeader.append('access-token', data['access-token']);
         this.contentHeader.append('client', data['client']);
@@ -371,11 +359,13 @@ export class MapPage {
         this.pollingDevices();
         this.polling();
         Observable.interval(2000 * 60).subscribe(x => {
-          this.polling();
+          if (this.device_id == null || this.device_id.length <= 0) {
+            this.polling();
+          }
         });
       });
      }
-  }
+  // }
 
   // Fit pins into bounds
   processPoints(geometry, callback, thisArg) {

@@ -1,6 +1,7 @@
 import { Component, ViewChild, NgModule } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import { Validators, FormGroup, FormControl } from '@angular/forms';
+import { CallNumber } from '@ionic-native/call-number';
 
 import { TabsNavigationPage } from '../tabs-navigation/tabs-navigation';
 import { MapPage } from '../map/map';
@@ -22,10 +23,12 @@ export class SubMenuPage {
   startdate: String = new Date(new Date().setDate(new Date().getDate() - 30)).toISOString();
   enddate: string = new Date().toISOString();
   title: string = "";
+  device_number: string = "";
 
   constructor(
     public nav: NavController,
     private navParams: NavParams,
+    private callNumber: CallNumber,
     public events: Events
   ) {
     this.main_page = { component: TabsNavigationPage };
@@ -35,6 +38,7 @@ export class SubMenuPage {
 
     this.showDrawBtn = navParams.get('showDrawBtn');
     this.title = navParams.get('title');
+    this.device_number = navParams.get('device_number');
     //console.log(this.title);
 
     events.subscribe('submenu:setvalues', () => {
@@ -67,7 +71,12 @@ export class SubMenuPage {
   }
 
   callDeviceNumber() {
-    this.events.publish('map:callDeviceNumber');
+    //this.events.publish('map:callDeviceNumber');
+    console.log(this.device_number);
+    this.callNumber.callNumber("00" + this.device_number, true)
+      .then(() => console.log('Launched dialer!'))
+      .catch(() => console.log('Error launching dialer'));
+
   }
 
 }

@@ -49,19 +49,19 @@ export class WalkthroughPage {
   }
 
   ionViewWillEnter(){
-    if(this.platform.is('cordova')){
-      this.nativeStorage.getItem('user').then(
-        value => {
-          if(value){
-            // do nothing is authorized
-            this.nav.setRoot(MapPage);
-          }else{
-            // unauthorized
-          }
-        },
-        error => console.error(error)
-      );
-    }else{
+    // if(this.platform.is('cordova')){
+    //   this.nativeStorage.getItem('user').then(
+    //     value => {
+    //       if(value){
+    //         // do nothing is authorized
+    //         this.nav.setRoot(MapPage);
+    //       }else{
+    //         // unauthorized
+    //       }
+    //     },
+    //     error => console.error(error)
+    //   );
+    // }else{
       this.storage.get('user').then((value) => {
         if(value){
           // do nothing is authorized
@@ -70,7 +70,7 @@ export class WalkthroughPage {
           // unauthorized
         }
       });
-    }
+    // }
   }
 
 }

@@ -70,19 +70,19 @@ export class LoginPage {
             "expiry": headers.get('expiry')
           }
 
-          if(this.platform.is('cordova')){
-            this.nativeStorage.setItem('authorize_identity', authorize_identity);
-            this.nativeStorage.setItem('user', data);
-           }else{
+          // if(this.platform.is('cordova')){
+          //   this.nativeStorage.setItem('authorize_identity', authorize_identity);
+          //   this.nativeStorage.setItem('user', data);
+          //  }else{
             this.storage.set('authorize_identity', authorize_identity);
             this.storage.set('user', data);
-           }
+           // }
 
-           this.storage.get('authorize_identity').then((data) => {
-              console.log(data['access-token']);
-              console.log(data['client']);
-              console.log(data['uid']);
-           });
+           // this.storage.get('authorize_identity').then((data) => {
+           //    console.log(data['access-token']);
+           //    console.log(data['client']);
+           //    console.log(data['uid']);
+           // });
 
           this.nav.setRoot(this.main_page.component);
           this.loading.dismiss();

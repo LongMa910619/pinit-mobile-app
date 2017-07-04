@@ -9,6 +9,7 @@ import { MapPage } from '../pages/map/map';
 
 import { WalkthroughPage } from '../pages/walkthrough/walkthrough';
 import { SettingsPage } from '../pages/settings/settings';
+import { AddWatchPage } from '../pages/add-watch/add-watch';
 import { Events } from 'ionic-angular';
 
 @Component({
@@ -22,6 +23,7 @@ export class MyApp {
 
   // make WalkthroughPage the root (or first) page
   rootPage: any = WalkthroughPage;
+  addWatchPage: any = AddWatchPage;
   // rootPage: any = TabsNavigationPage;
 
   pages: Array<{title: string, icon: string, component: any}>;
@@ -67,6 +69,7 @@ export class MyApp {
     this.menu.close();
     // navigate to the new page if it is not the current page
 
+    this.events.publish('app:selectdevice', "");
     this.nav.setRoot(page.component);
   }
 
@@ -83,7 +86,8 @@ export class MyApp {
   }
 
   gotoAddWatch() {
+    //this.events.publish('map:addwatch');
     this.menu.close();
-    this.events.publish('map:addwatch');
+    this.app.getRootNav().push(this.addWatchPage);
   }
 }
