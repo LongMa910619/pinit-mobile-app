@@ -91,7 +91,7 @@ export class MapPage {
       var notificationPermissionCallback = function(status) {
         /*let mobile_uuid = Device.uuid;
         let mobile_type = (this.platform.is('ios') ? 'ios' : (this.platform.is('android') ? 'android' : 'unknown'));
-        
+
         let strURL = this.NOTIFICATION_URL;
         let json = JSON.stringify({device : {device_id: mobile_uuid, mobile_type: mobile_type}});
 
@@ -172,6 +172,10 @@ export class MapPage {
 
   ionViewDidLoad() {
     this.loadMap();
+  }
+
+  ionViewDidEnter() {
+    google.maps.event.trigger(this.map, 'resize');
   }
 
   callDeviceNumber() {
@@ -310,7 +314,6 @@ export class MapPage {
       // $('#device-name').html($(this).find('option:selected').text());
       this.init_ajax_get_circle_geofence();
     }
-    google.maps.event.trigger(this.map, 'resize');
   }
 
   loadMap(){
