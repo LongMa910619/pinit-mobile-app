@@ -7,7 +7,9 @@
           <ion-option *ngFor="let device of devices" value="{{device.id}}">{{ device.friendly_name }}</ion-option>
         </ion-select>
       </ion-item>
+      <!--
       <button ion-item (click)="gotoAddWatch()">+ Add Watch</button>
+ -->
       <button ion-item detail-none *ngFor="let page of pages" (click)="openPage(page)">
         <ion-icon *ngIf="page.icon" name="{{page.icon}}" item-left></ion-icon>
         {{page.title}}
