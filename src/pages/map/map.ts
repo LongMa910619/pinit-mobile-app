@@ -84,42 +84,58 @@ export class MapPage {
       { title: 'Logout', icon: 'exit', component: SettingsPage }
     ];
 
-      var notificationOpenedCallback = function(jsonData) {
-        alert('notificationOpenedCallback: ' + JSON.stringify(jsonData));
-      };
+    if(/*this.platform.is('cordova')*/this.platform.is('ios') || this.platform.is('android')){
+      this.oneSignal.startInit('8afb6c4c-51ed-4332-ae8a-0079a0d8d4f2', '');
+      this.oneSignal.inFocusDisplaying(this.oneSignal.OSInFocusDisplayOption.InAppAlert);
+      this.oneSignal.handleNotificationReceived().subscribe(() => {
+        // do something when notification is received
+        alert("Receive notification");
+      });
+      this.oneSignal.handleNotificationOpened().subscribe(() => {
+        // do something when a notification is opened
+        alert("Open notification");
+      });
+      this.oneSignal.endInit();
 
-      var notificationPermissionCallback = function(status) {
-        /*let mobile_uuid = Device.uuid;
-        let mobile_type = (this.platform.is('ios') ? 'ios' : (this.platform.is('android') ? 'android' : 'unknown'));
+      window["plugins"].OneSignal.addPermissionObserver(function(state) {
+        alert(state.to.status);
+        if (state.to.status == 2) {
+          let mobile_uuid = Device.uuid;
+          let mobile_type = (this.platform.is('ios') ? 'ios' : (this.platform.is('android') ? 'android' : 'unknown'));
 
-        let strURL = this.NOTIFICATION_URL;
-        let json = JSON.stringify({device : {device_id: mobile_uuid, mobile_type: mobile_type}});
+          let strURL = this.NOTIFICATION_URL;
+          let json = JSON.stringify({device : {device_id: mobile_uuid, mobile_type: mobile_type}});
 
-        alert(json);
-        this.http.post(strURL, json, { headers: this.contentHeader }).subscribe(
-          data => {
+          alert(json);
+          this.http.post(strURL, json, { headers: this.contentHeader }).subscribe(
+            data => {
 
-          },
-          err => {
-            if(err.status == 401 && err.statusText == 'Unauthorized'){
-              let toast = this.toastCtrl.create({
-                message: 'API request unsuccessful',
-                duration: 3000
-              });
-              toast.present();
+            },
+            err => {
+              if(err.status == 401 && err.statusText == 'Unauthorized'){
+                let toast = this.toastCtrl.create({
+                  message: 'API request unsuccessful',
+                  duration: 3000
+                });
+                toast.present();
+              }
+              this.loading.dismiss();
             }
-            this.loading.dismiss();
-          }
-        );*/
-      };
+          );
+        }
+      });
+  }
 
-    if (this.platform.is('ios') || this.platform.is('android')) {
+    /*var notificationOpenedCallback = function(jsonData) {
+      alert('notificationOpenedCallback: ' + JSON.stringify(jsonData));
+    };*/
+
+    /*if (this.platform.is('ios') || this.platform.is('android')) {
       window["plugins"].OneSignal
         .startInit("6bb0475c-21ab-486d-b58e-d78d0bf1e45a", "373548359818")
         .handleNotificationOpened(notificationOpenedCallback)
-        //.getPermissionSubscriptionState(notificationPermissionCallback)
         .endInit();
-    }
+    }*/
 
     this.geolocation.getCurrentPosition().then((resp) => {
       this.defaultLat = resp.coords.latitude;
