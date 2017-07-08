@@ -84,58 +84,32 @@ export class MapPage {
       { title: 'Logout', icon: 'exit', component: SettingsPage }
     ];
 
-    if(/*this.platform.is('cordova')*/this.platform.is('ios') || this.platform.is('android')){
+    if(this.platform.is('ios') || this.platform.is('android')){
       this.oneSignal.startInit('8afb6c4c-51ed-4332-ae8a-0079a0d8d4f2', '');
       this.oneSignal.inFocusDisplaying(this.oneSignal.OSInFocusDisplayOption.InAppAlert);
       this.oneSignal.handleNotificationReceived().subscribe(() => {
         // do something when notification is received
-        alert("Receive notification");
+        console.log("Receive notification");
       });
       this.oneSignal.handleNotificationOpened().subscribe(() => {
         // do something when a notification is opened
-        alert("Open notification");
+        console.log("Open notification");
       });
       this.oneSignal.endInit();
 
+      let mobile_uuid = Device.uuid;
+      let mobile_type = (this.platform.is('ios') ? 'ios' : (this.platform.is('android') ? 'android' : 'unknown'));
+      let global_this = this;
+
       window["plugins"].OneSignal.addPermissionObserver(function(state) {
-        alert(state.to.status);
         if (state.to.status == 2) {
-          let mobile_uuid = Device.uuid;
-          let mobile_type = (this.platform.is('ios') ? 'ios' : (this.platform.is('android') ? 'android' : 'unknown'));
+          let json = JSON.stringify({device_id: mobile_uuid, mobile_type: mobile_type});
 
-          let strURL = this.NOTIFICATION_URL;
-          let json = JSON.stringify({device : {device_id: mobile_uuid, mobile_type: mobile_type}});
-
-          alert(json);
-          this.http.post(strURL, json, { headers: this.contentHeader }).subscribe(
-            data => {
-
-            },
-            err => {
-              if(err.status == 401 && err.statusText == 'Unauthorized'){
-                let toast = this.toastCtrl.create({
-                  message: 'API request unsuccessful',
-                  duration: 3000
-                });
-                toast.present();
-              }
-              this.loading.dismiss();
-            }
-          );
+          console.log(json);
+          global_this.updateDevice(json);
         }
       });
   }
-
-    /*var notificationOpenedCallback = function(jsonData) {
-      alert('notificationOpenedCallback: ' + JSON.stringify(jsonData));
-    };*/
-
-    /*if (this.platform.is('ios') || this.platform.is('android')) {
-      window["plugins"].OneSignal
-        .startInit("6bb0475c-21ab-486d-b58e-d78d0bf1e45a", "373548359818")
-        .handleNotificationOpened(notificationOpenedCallback)
-        .endInit();
-    }*/
 
     this.geolocation.getCurrentPosition().then((resp) => {
       this.defaultLat = resp.coords.latitude;
@@ -168,10 +142,6 @@ export class MapPage {
       this.add_watch(name, id, sn, pwd);
     });
 
-    events.subscribe('map:callDeviceNumber', () => {
-      this.callDeviceNumber();
-    });
-
     events.subscribe('sub-menu:title', (title) => {
       this.sub_menu_title = title;
     });
@@ -192,13 +162,6 @@ export class MapPage {
 
   ionViewDidEnter() {
     google.maps.event.trigger(this.map, 'resize');
-  }
-
-  callDeviceNumber() {
-    /*console.log(this.device_number);
-    this.callNumber.callNumber("00" + this.device_number, true)
-      .then(() => console.log('Launched dialer!'))
-      .catch(() => console.log('Error launching dialer'));*/
   }
 
   removeMapData() {
@@ -239,8 +202,6 @@ export class MapPage {
       this.map.fitBounds(bounds);
     }
 
-    //this.map.fitBounds(bounds);
-
     this.map.data.setStyle(function(feature) {
       return {
         icon: feature.getProperty('icon')
@@ -252,9 +213,27 @@ export class MapPage {
     this.http.get(this.POLLING_URL, { headers: this.contentHeader }).subscribe(
       data => {
         let response = data.json();
-        //console.log(response);
-        //this.removeMapData();
         this.markView(response);
+      },
+      err => {
+        if(err.status == 401 && err.statusText == 'Unauthorized'){
+          let toast = this.toastCtrl.create({
+            message: 'API request unsuccessful',
+            duration: 3000
+          });
+          toast.present();
+        }
+        this.loading.dismiss();
+      }
+    );
+  }
+
+  updateDevice(json) {
+    console.log("Update Device");
+    console.log(this.contentHeader);
+    this.http.post(this.NOTIFICATION_URL, json, { headers: this.contentHeader }).subscribe(
+      data => {
+        console.log(data);
       },
       err => {
         if(err.status == 401 && err.statusText == 'Unauthorized'){
@@ -347,11 +326,9 @@ export class MapPage {
       this.fLng = event.latLng.lng();
       this.events.publish('app:selectdevice', event.feature.getProperty('device_id'));
       this.navCtrl.push(SubMenuPage, { showDrawBtn: this.showDrawBtn, title: this.sub_menu_title, device_number: event.feature.getProperty('msisdn') });
-      //this.device_number = event.feature.getProperty('msisdn');
     });
 
     this.map.addListener('zoom_changed', (event) => {
-      ////if (this.selectDevice.value.length > 0) {
       if (this.device_id != null && this.device_id.length > 0) {
         localStorage.setItem(this.device_id, this.map.getZoom());
       }
@@ -372,9 +349,6 @@ export class MapPage {
         this.contentHeader.append('client', data['client']);
         this.contentHeader.append('uid', data['uid']);
 
-        //console.log(data['access-token']);
-        //console.log(data['client']);
-        //console.log(data['uid']);
         this.pollingDevices();
         this.polling();
         Observable.interval(2000 * 60).subscribe(x => {
